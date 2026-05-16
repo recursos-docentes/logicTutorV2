@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LogicTEA Tutor PRO</title>
+<title>Logic Tutor</title>
 
 <style>
 
@@ -195,7 +195,7 @@ th{
 
 <div class="container">
 
-<h1>🧠 LogicTEA Tutor PRO</h1>
+<h1>🧠 Logic Tutor</h1>
 
 <p class="subtitle">
 Aprende tablas de verdad paso a paso
@@ -205,16 +205,17 @@ Aprende tablas de verdad paso a paso
 
 <b>Operadores:</b><br><br>
 
-& → AND<br>
-| → OR<br>
-! → NOT<br>
-> → CONDICIONAL<br><br>
+∧ → AND
+∨ → OR
+¬ → NOT
+→ → CONDICIONAL
+↔ → BICONDICIONAL
 
 <b>Ejemplos:</b><br>
 
-(p & q)<br>
-!(p)<br>
-((p & q) > r)
+(p ∧ q)<br>
+¬(p)<br>
+((p ∧ q) → r)
 
 </div>
 
@@ -222,12 +223,12 @@ Aprende tablas de verdad paso a paso
 
 <div class="symbols">
 
-<button class="symbolBtn" onclick="insertSymbol('&')">&</button>
-<button class="symbolBtn" onclick="insertSymbol('|')">|</button>
-<button class="symbolBtn" onclick="insertSymbol('!')">!</button>
-<button class="symbolBtn" onclick="insertSymbol('>')">></button>
-<button class="symbolBtn" onclick="insertSymbol('(')">(</button>
-<button class="symbolBtn" onclick="insertSymbol(')')">)</button>
+<button class="symbolBtn" onclick="insertSymbol('∧')">∧</button>
+<button class="symbolBtn" onclick="insertSymbol('∨')">∨</button>
+<button class="symbolBtn" onclick="insertSymbol('¬')">¬</button>
+<button class="symbolBtn" onclick="insertSymbol('→')">→</button>
+<button class="symbolBtn" onclick="insertSymbol('↔')">↔</button>
+
 
 </div>
 
@@ -281,17 +282,19 @@ function evaluateExpression(expr, values){
 
     let parsed = expr;
 
-    parsed = parsed.replace(/!/g, "!");
-    parsed = parsed.replace(/&/g, "&&");
-    parsed = parsed.replace(/\|/g, "||");
+    // Conectivas lógicas formales
+    parsed = parsed.replace(/¬/g, "!");
+    parsed = parsed.replace(/∧/g, "&&");
+    parsed = parsed.replace(/∨/g, "||");
+    parsed = parsed.replace(/→/g, " <= ");
+    parsed = parsed.replace(/↔/g, " == ");
 
+    // Reemplazar variables por valores
     parsed = parsed.replace(/([a-z])/g, function(match){
 
         return values[match];
 
     });
-
-    parsed = parsed.replace(/>/g, " <= ");
 
     try{
 
