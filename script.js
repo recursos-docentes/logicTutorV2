@@ -144,45 +144,61 @@ function generateTruthTable(){
 
     const rows = Math.pow(2, vars.length);
 
+    // obtener subfórmulas
+    let subformulas = extractSubformulas(formula);
+
+    // quitar variables simples
+    subformulas = subformulas.filter(f => !/^[a-z]$/i.test(f));
+
+    let columns = [...vars, ...subformulas];
+
     let table = "<table><tr>";
 
-    vars.forEach(v=>{
+    columns.forEach(col => {
 
-        table += `<th>${v}</th>`;
+        table += `<th>${col}</th>`;
 
     });
 
-    table += `<th>${formula}</th></tr>`;
+    table += "</tr>";
 
-    for(let i=0; i<rows; i++){
+    for(let i = 0; i < rows; i++){
 
         let values = {};
 
         vars.forEach((v,index)=>{
 
-            values[v] = !Boolean((i >> (vars.length-index-1)) & 1);
+            values[v] = !Boolean(
+                (i >> (vars.length-index-1)) & 1
+            );
 
         });
 
-        let result = evaluateExpression(formula, values);
-
         table += "<tr>";
 
+        // VARIABLES
         vars.forEach(v=>{
 
             table += `
             <td class="${values[v] ? 'true':'false'}">
-            ${values[v] ? 'V':'F'}
+                ${values[v] ? 'V':'F'}
             </td>
             `;
 
         });
 
-        table += `
-        <td class="${result ? 'true':'false'}">
-        ${result ? 'V':'F'}
-        </td>
-        `;
+        // SUBFÓRMULAS
+        subformulas.forEach(sub=>{
+
+            let result = evaluateExpression(sub, values);
+
+            table += `
+            <td class="${result ? 'true':'false'}">
+                ${result ? 'V':'F'}
+            </td>
+            `;
+
+        });
 
         table += "</tr>";
 
@@ -193,7 +209,6 @@ function generateTruthTable(){
     document.getElementById("tableContainer").innerHTML = table;
 
 }
-
 function startGuidedMode(){
 
     const formula = document.getElementById("formula").value;
