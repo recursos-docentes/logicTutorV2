@@ -324,7 +324,7 @@ function startGuidedMode(){
 
         let values = {};
 
-        // VARIABLES
+        // VARIABLES BASE
         vars.forEach((v,index)=>{
 
             values[v] = !Boolean(
@@ -333,24 +333,29 @@ function startGuidedMode(){
 
         });
 
-        // resolver TODAS las subfórmulas
-        let results = {};
+        // GUARDAR PASOS
+        let steps = [];
 
+        // RESOLVER SUBFÓRMULAS
         subformulas.forEach(sub=>{
 
             let result = solveSubformula(sub, values);
 
-            results[sub] = result;
+            steps.push({
+                formula: sub,
+                result: result
+            });
 
+            // guardar resultado temporal
             values[sub] = result;
 
         });
 
         guidedRows.push({
 
-            values: {...values},
-            results: results,
-            finalResult: results[subformulas[subformulas.length - 1]]
+            vars: {...values},
+            steps: steps,
+            finalResult: steps[steps.length - 1].result
 
         });
 
@@ -384,17 +389,17 @@ function askQuestion(){
 
     currentAnswer = row.finalResult;
 
+    // VARIABLES
     let valuesText = "";
 
-    for(let key in row.values){
+    for(let key in row.vars){
 
-        // mostrar solo variables simples
         if(/^[a-z]$/i.test(key)){
 
             valuesText += `
             <div>
-            <b>${key}</b> =
-            ${row.values[key] ? '🟩 Verdadero':'🟦 Falso'}
+                <b>${key}</b> =
+                ${row.vars[key] ? '🟩 Verdadero' : '🟦 Falso'}
             </div>
             `;
 
@@ -402,18 +407,20 @@ function askQuestion(){
 
     }
 
-    // mostrar subfórmulas
+    // PASOS
     let stepsText = "";
 
-    for(let sub in row.results){
+    row.steps.forEach(step=>{
 
         stepsText += `
         <div class="step">
-        <b>${sub}</b> =
-        ${row.results[sub] ? '🟩 V':'🟦 F'}
+            <b>${step.formula}</b>
+            =
+            ${step.result ? '🟩 V' : '🟦 F'}
         </div>
         `;
-    }
+
+    });
 
     document.getElementById("progress").innerHTML = `
     Ejercicio ${currentRow + 1} de ${guidedRows.length}
@@ -423,37 +430,35 @@ function askQuestion(){
 
     <div class="question">
 
-    ${valuesText}
+        ${valuesText}
 
-    <br>
+        <br>
 
-    <b>Resolución paso a paso:</b>
+        <b>Resolución paso a paso:</b>
 
-    ${stepsText}
+        ${stepsText}
 
-    <br>
+        <br>
 
-    Entonces:
+        ¿Resultado final de:
 
-    <br><br>
+        <br><br>
 
-    <b>${formula}</b>
+        <b>${formula}</b>
 
-    =
+        ?
 
-    ?
+        <div class="answerButtons">
 
-    <div class="answerButtons">
+            <button onclick="checkAnswer(true)">
+                🟩 Verdadero
+            </button>
 
-    <button onclick="checkAnswer(true)">
-    🟩 Verdadero
-    </button>
+            <button onclick="checkAnswer(false)">
+                🟦 Falso
+            </button>
 
-    <button onclick="checkAnswer(false)">
-    🟦 Falso
-    </button>
-
-    </div>
+        </div>
 
     </div>
 
