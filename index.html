@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LogicTEA Tutor</title>
+
+<style>
+body{
+    font-family: Arial, sans-serif;
+    background:#f4f7fb;
+    color:#333;
+    margin:0;
+    padding:20px;
+}
+
+.container{
+    max-width:1000px;
+    margin:auto;
+    background:white;
+    padding:20px;
+    border-radius:20px;
+    box-shadow:0 0 10px rgba(0,0,0,0.1);
+}
+
+h1{
+    text-align:center;
+    color:#2b4c7e;
+}
+
+.subtitle{
+    text-align:center;
+    margin-bottom:20px;
+}
+
+textarea{
+    width:100%;
+    height:80px;
+    font-size:22px;
+    padding:10px;
+    border-radius:10px;
+    border:2px solid #aac4ff;
+    resize:none;
+}
+
+button{
+    margin-top:15px;
+    padding:15px;
+    font-size:18px;
+    border:none;
+    border-radius:12px;
+    background:#4c7ef3;
+    color:white;
+    cursor:pointer;
+    width:100%;
+}
+
+button:hover{
+    background:#3a68d6;
+}
+
+.step{
+    margin-top:20px;
+    padding:15px;
+    border-radius:15px;
+    background:#eef4ff;
+    border-left:8px solid #4c7ef3;
+    font-size:20px;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:20px;
+    font-size:20px;
+}
+
+th, td{
+    border:1px solid #ccc;
+    padding:10px;
+    text-align:center;
+}
+
+th{
+    background:#d9e8ff;
+}
+
+.true{
+    background:#c8f7c5;
+    font-weight:bold;
+}
+
+.false{
+    background:#cce0ff;
+    font-weight:bold;
+}
+
+.instructions{
+    background:#fff7d6;
+    padding:15px;
+    border-radius:15px;
+    margin-bottom:20px;
+    font-size:18px;
+}
+
+.operator{
+    font-size:24px;
+    font-weight:bold;
+    color:#2b4c7e;
+}
+
+@media screen and (max-width:600px){
+    textarea{
+        font-size:18px;
+    }
+
+    table{
+        font-size:16px;
+    }
+
+    button{
+        font-size:16px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>🧠 LogicTEA Tutor</h1>
+
+<p class="subtitle">
+Aprende tablas de verdad paso a paso
+</p>
+
+<div class="instructions">
+<b>Instrucciones:</b><br><br>
+
+Escribe una fórmula lógica usando:
+
+<ul>
+<li><b>&</b> para AND</li>
+<li><b>|</b> para OR</li>
+<li><b>!</b> para NOT</li>
+<li><b>></b> para CONDICIONAL</li>
+</ul>
+
+Ejemplos:
+<ul>
+<li>(p & q)</li>
+<li>(p | q)</li>
+<li>((p & q) > r)</li>
+<li>!(p)</li>
+</ul>
+</div>
+
+<textarea id="formula" placeholder="Escribe tu fórmula aquí..."></textarea>
+
+<button onclick="generateTruthTable()">
+✨ Resolver Paso a Paso
+</button>
+
+<div id="steps"></div>
+
+<div id="tableContainer"></div>
+
+</div>
+
+<script>
+
+function implication(a,b){
+    return (!a || b);
+}
+
+function evaluateExpression(expr, values){
+
+    let parsed = expr;
+
+    parsed = parsed.replace(/!/g, "!");
+    parsed = parsed.replace(/&/g, "&&");
+    parsed = parsed.replace(/\|/g, "||");
+
+    parsed = parsed.replace(/([a-z])/g, function(match){
+        return values[match];
+    });
+
+    parsed = parsed.replace(/>/g, " <= ");
+
+    try{
+        return eval(parsed);
+    }catch{
+        return false;
+    }
+}
+
+function getVariables(expr){
+    let vars = expr.match(/[a-z]/g);
+    return [...new Set(vars)].sort();
+}
+
+function generateTruthTable(){
+
+    const formula = document.getElementById("formula").value;
+
+    const tableContainer = document.getElementById("tableContainer");
+    const stepsDiv = document.getElementById("steps");
+
+    tableContainer.innerHTML = "";
+    stepsDiv.innerHTML = "";
+
+    if(formula.trim() === ""){
+        alert("Por favor escribe una fórmula.");
+        return;
+    }
+
+    const vars = getVariables(formula);
+
+    const rows = Math.pow(2, vars.length);
+
+    let table = "<table><tr>";
+
+    vars.forEach(v=>{
+        table += `<th>${v}</th>`;
+    });
+
+    table += `<th>${formula}</th></tr>`;
+
+    for(let i=0; i<rows; i++){
+
+        let values = {};
+
+        vars.forEach((v,index)=>{
+           values[v] = !Boolean((i >> (vars.length-index-1)) & 1);
+        });
+
+        let result = evaluateExpression(formula, values);
+
+        table += "<tr>";
+
+        vars.forEach(v=>{
+            table += `
+            <td class="${values[v] ? 'true':'false'}">
+            ${values[v] ? 'V':'F'}
+            </td>`;
+        });
+
+        table += `
+        <td class="${result ? 'true':'false'}">
+        ${result ? 'V':'F'}
+        </td>`;
+
+        table += "</tr>";
+    }
+
+    table += "</table>";
+
+    tableContainer.innerHTML = table;
+
+    generateSteps(formula);
+}
+
+function generateSteps(formula){
+
+    const stepsDiv = document.getElementById("steps");
+
+    let explanation = "";
+
+    if(formula.includes("&")){
+        explanation += `
+        <div class="step">
+        <span class="operator">AND (&)</span><br><br>
+        La conjunción solo es verdadera cuando ambas proposiciones son verdaderas.
+        </div>
+        `;
+    }
+
+    if(formula.includes("|")){
+        explanation += `
+        <div class="step">
+        <span class="operator">OR (|)</span><br><br>
+        La disyunción es verdadera cuando al menos una proposición es verdadera.
+        </div>
+        `;
+    }
+
+    if(formula.includes("!")){
+        explanation += `
+        <div class="step">
+        <span class="operator">NOT (!)</span><br><br>
+        La negación cambia Verdadero por Falso y Falso por Verdadero.
+        </div>
+        `;
+    }
+
+    if(formula.includes(">")){
+        explanation += `
+        <div class="step">
+        <span class="operator">CONDICIONAL (>)</span><br><br>
+        La implicación solo es falsa cuando la primera proposición es verdadera y la segunda es falsa.
+        </div>
+        `;
+    }
+
+    explanation += `
+    <div class="step">
+    ✅ Tabla generada correctamente.<br><br>
+    Observa cada fila lentamente y analiza cómo cambia el resultado.
+    </div>
+    `;
+
+    stepsDiv.innerHTML = explanation;
+}
+
+</script>
+
+</body>
+</html>
