@@ -136,6 +136,96 @@ function evaluateExpression(expr, values){
 
 }
 
+function solveSubformula(expr, values){
+
+    expr = expr.trim();
+
+    // NEGACIÓN
+    if(expr.startsWith("¬")){
+
+        let inner = expr.slice(1);
+
+        return !solveSubformula(inner, values);
+
+    }
+
+    // quitar paréntesis externos
+    if(
+        expr.startsWith("(") &&
+        expr.endsWith(")")
+    ){
+
+        let balance = 0;
+        let valid = true;
+
+        for(let i=0; i<expr.length-1; i++){
+
+            if(expr[i] === "(") balance++;
+            if(expr[i] === ")") balance--;
+
+            if(balance === 0){
+
+                valid = false;
+                break;
+
+            }
+
+        }
+
+        if(valid){
+
+            expr = expr.slice(1,-1);
+
+        }
+
+    }
+
+    let operators = ["↔","→","∨","∧"];
+
+    for(let op of operators){
+
+        let balance = 0;
+
+        for(let i=0; i<expr.length; i++){
+
+            if(expr[i] === "(") balance++;
+            if(expr[i] === ")") balance--;
+
+            if(balance === 0 && expr[i] === op){
+
+                let left = expr.slice(0,i);
+                let right = expr.slice(i+1);
+
+                let A = solveSubformula(left, values);
+                let B = solveSubformula(right, values);
+
+                switch(op){
+
+                    case "∧":
+                        return A && B;
+
+                    case "∨":
+                        return A || B;
+
+                    case "→":
+                        return (!A || B);
+
+                    case "↔":
+                        return A === B;
+
+                }
+
+            }
+
+        }
+
+    }
+
+    // variable simple
+    return values[expr];
+
+}
+
 function generateTruthTable(){
 
     const formula = document.getElementById("formula").value;
@@ -144,17 +234,17 @@ function generateTruthTable(){
 
     const rows = Math.pow(2, vars.length);
 
-    // obtener subfórmulas
     let subformulas = extractSubformulas(formula);
 
-    // quitar variables simples
-    subformulas = subformulas.filter(f => !/^[a-z]$/i.test(f));
+    subformulas = subformulas.filter(
+        f => !/^[a-z]$/i.test(f)
+    );
 
     let columns = [...vars, ...subformulas];
 
     let table = "<table><tr>";
 
-    columns.forEach(col => {
+    columns.forEach(col=>{
 
         table += `<th>${col}</th>`;
 
@@ -166,6 +256,7 @@ function generateTruthTable(){
 
         let values = {};
 
+        // VARIABLES BASE
         vars.forEach((v,index)=>{
 
             values[v] = !Boolean(
@@ -176,25 +267,28 @@ function generateTruthTable(){
 
         table += "<tr>";
 
-        // VARIABLES
+        // mostrar variables
         vars.forEach(v=>{
 
             table += `
             <td class="${values[v] ? 'true':'false'}">
-                ${values[v] ? 'V':'F'}
+            ${values[v] ? 'V':'F'}
             </td>
             `;
 
         });
 
-        // SUBFÓRMULAS
+        // resolver subfórmulas EN ORDEN
         subformulas.forEach(sub=>{
 
-            let result = evaluateExpression(sub, values);
+            let result = solveSubformula(sub, values);
+
+            // GUARDAR RESULTADO
+            values[sub] = result;
 
             table += `
             <td class="${result ? 'true':'false'}">
-                ${result ? 'V':'F'}
+            ${result ? 'V':'F'}
             </td>
             `;
 
@@ -209,6 +303,7 @@ function generateTruthTable(){
     document.getElementById("tableContainer").innerHTML = table;
 
 }
+
 function startGuidedMode(){
 
     const formula = document.getElementById("formula").value;
