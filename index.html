@@ -1,564 +1,141 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Logic Tutor</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logic Tutor</title>
 
-<style>
-
-body{
-    font-family: Arial, sans-serif;
-    background:#eef3f9;
-    margin:0;
-    padding:20px;
-    color:#333;
-}
-
-.container{
-    max-width:1200px;
-    margin:auto;
-    background:white;
-    padding:25px;
-    border-radius:20px;
-    box-shadow:0 0 15px rgba(0,0,0,0.1);
-}
-
-h1{
-    text-align:center;
-    color:#29527a;
-}
-
-.subtitle{
-    text-align:center;
-    margin-bottom:20px;
-    font-size:18px;
-}
-
-.instructions{
-    background:#fff4cc;
-    padding:15px;
-    border-radius:15px;
-    margin-bottom:20px;
-    font-size:18px;
-    line-height:1.6;
-}
-
-textarea{
-    width:100%;
-    height:90px;
-    font-size:24px;
-    border-radius:15px;
-    border:2px solid #aac7ff;
-    padding:15px;
-    resize:none;
-}
-
-.buttons{
-    display:flex;
-    gap:15px;
-    flex-wrap:wrap;
-    margin-top:20px;
-}
-
-button{
-    flex:1;
-    min-width:200px;
-    padding:15px;
-    border:none;
-    border-radius:15px;
-    font-size:18px;
-    background:#4a7dff;
-    color:white;
-    cursor:pointer;
-}
-
-button:hover{
-    background:#3565dd;
-}
-
-table{
-    width:100%;
-    border-collapse:collapse;
-    margin-top:20px;
-    font-size:20px;
-}
-
-th, td{
-    border:1px solid #ccc;
-    padding:10px;
-    text-align:center;
-}
-
-th{
-    background:#dce8ff;
-}
-
-.true{
-    background:#c9f7c5;
-    font-weight:bold;
-}
-
-.false{
-    background:#cfe1ff;
-    font-weight:bold;
-}
-
-.step{
-    background:#eef5ff;
-    padding:15px;
-    border-left:8px solid #4a7dff;
-    border-radius:12px;
-    margin-top:15px;
-    font-size:20px;
-}
-
-.current{
-    background:#ffeaa7;
-}
-
-.feedback{
-    margin-top:20px;
-    padding:15px;
-    border-radius:12px;
-    font-size:22px;
-    text-align:center;
-}
-
-.correct{
-    background:#d4f8d4;
-}
-
-.wrong{
-    background:#ffd4d4;
-}
-
-.symbols{
-    display:flex;
-    gap:10px;
-    flex-wrap:wrap;
-    margin-top:20px;
-}
-
-.symbolBtn{
-    background:#8aaeff;
-    padding:10px;
-    border-radius:10px;
-    font-size:22px;
-    min-width:60px;
-}
-
-.question{
-    margin-top:20px;
-    font-size:24px;
-    background:#eef5ff;
-    padding:20px;
-    border-radius:15px;
-}
-
-.answerButtons{
-    display:flex;
-    gap:20px;
-    margin-top:20px;
-}
-
-.answerButtons button{
-    font-size:24px;
-}
-
-.progress{
-    margin-top:20px;
-    font-size:22px;
-    text-align:center;
-}
-
-@media(max-width:700px){
-
-    table{
-        font-size:15px;
-    }
-
-    textarea{
-        font-size:18px;
-    }
-
-    button{
-        font-size:16px;
-    }
-
-}
-
-</style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
 
-<div class="container">
+    <div class="container">
+
+        <h1>🧠 Logic Tutor</h1>
+
+        <p class="subtitle">
+            Aprende tablas de verdad paso a paso
+        </p>
+
+        <!-- CONECTIVAS -->
+
+        <div class="instructions">
+
+            <h2>📘 Conectivas Lógicas</h2>
+
+            <p>
+                Estas son las conectivas que puedes usar para escribir fórmulas.
+            </p>
+
+            <div class="logic-grid">
+
+                <div class="logic-card neg">
+                    <div class="symbol">¬</div>
+                    <div>
+                        <b>NEGACIÓN</b><br>
+                        Niega el valor de verdad.
+                        <br><br>
+                        Ejemplo:<br>
+                        ¬p
+                    </div>
+                </div>
+
+                <div class="logic-card and">
+                    <div class="symbol">∧</div>
+                    <div>
+                        <b>CONJUNCIÓN</b><br>
+                        Verdadera solo si ambas proposiciones son verdaderas.
+                        <br><br>
+                        Ejemplo:<br>
+                        (p ∧ q)
+                    </div>
+                </div>
+
+                <div class="logic-card or">
+                    <div class="symbol">∨</div>
+                    <div>
+                        <b>DISYUNCIÓN</b><br>
+                        Verdadera si al menos una proposición es verdadera.
+                        <br><br>
+                        Ejemplo:<br>
+                        (p ∨ q)
+                    </div>
+                </div>
+
+                <div class="logic-card cond">
+                    <div class="symbol">→</div>
+                    <div>
+                        <b>CONDICIONAL</b><br>
+                        Solo es falsa cuando V → F.
+                        <br><br>
+                        Ejemplo:<br>
+                        ((p ∧ q) → r)
+                    </div>
+                </div>
+
+                <div class="logic-card bicond">
+                    <div class="symbol">↔</div>
+                    <div>
+                        <b>BICONDICIONAL</b><br>
+                        Verdadera cuando ambos valores coinciden.
+                        <br><br>
+                        Ejemplo:<br>
+                        (p ↔ q)
+                    </div>
+                </div>
+
+            </div>
 
-<h1>🧠 Logic Tutor</h1>
-
-<p class="subtitle">
-Aprende tablas de verdad paso a paso
-</p>
-
-<div class="instructions">
-
-<b>Operadores:</b><br><br>
-
-∧ → AND
-∨ → OR
-¬ → NOT
-→ → CONDICIONAL
-↔ → BICONDICIONAL
-
-<b>Ejemplos:</b><br>
-
-(p ∧ q)<br>
-¬(p)<br>
-((p ∧ q) → r)
-
-</div>
-
-<textarea id="formula"></textarea>
-
-<div class="symbols">
-
-<button class="symbolBtn" onclick="insertSymbol('∧')">∧</button>
-<button class="symbolBtn" onclick="insertSymbol('∨')">∨</button>
-<button class="symbolBtn" onclick="insertSymbol('¬')">¬</button>
-<button class="symbolBtn" onclick="insertSymbol('→')">→</button>
-<button class="symbolBtn" onclick="insertSymbol('↔')">↔</button>
-
-
-</div>
-
-<div class="buttons">
-
-<button onclick="generateTruthTable()">
-📊 Generar Tabla
-</button>
-
-<button onclick="startGuidedMode()">
-🧩 Resolver Conmigo
-</button>
-
-</div>
-
-<div class="progress" id="progress"></div>
-
-<div id="steps"></div>
-
-<div id="questionArea"></div>
-
-<div id="feedback"></div>
-
-<div id="tableContainer"></div>
-
-</div>
-
-<script>
-
-let guidedRows = [];
-let currentRow = 0;
-let currentAnswer = false;
-
-function insertSymbol(symbol){
-
-    let textarea = document.getElementById("formula");
-
-    textarea.value += symbol;
-
-}
-
-function getVariables(expr){
-
-    let vars = expr.match(/[a-z]/g);
-
-    return [...new Set(vars)].sort();
-
-}
-
-function evaluateExpression(expr, values){
-
-    let parsed = expr;
-
-    // Conectivas lógicas formales
-    parsed = parsed.replace(/¬/g, "!");
-    parsed = parsed.replace(/∧/g, "&&");
-    parsed = parsed.replace(/∨/g, "||");
-    parsed = parsed.replace(/→/g, " <= ");
-    parsed = parsed.replace(/↔/g, " == ");
-
-    // Reemplazar variables por valores
-    parsed = parsed.replace(/([a-z])/g, function(match){
-
-        return values[match];
-
-    });
-
-    try{
-
-        return eval(parsed);
-
-    }catch{
-
-        return false;
-
-    }
-
-}
-
-function generateTruthTable(){
-
-    const formula = document.getElementById("formula").value;
-
-    const vars = getVariables(formula);
-
-    const rows = Math.pow(2, vars.length);
-
-    let table = "<table><tr>";
-
-    vars.forEach(v=>{
-
-        table += `<th>${v}</th>`;
-
-    });
-
-    table += `<th>${formula}</th></tr>`;
-
-    for(let i=0; i<rows; i++){
-
-        let values = {};
-
-        vars.forEach((v,index)=>{
-
-            values[v] = !Boolean((i >> (vars.length-index-1)) & 1);
-
-        });
-
-        let result = evaluateExpression(formula, values);
-
-        table += "<tr>";
-
-        vars.forEach(v=>{
-
-            table += `
-            <td class="${values[v] ? 'true':'false'}">
-            ${values[v] ? 'V':'F'}
-            </td>
-            `;
-
-        });
-
-        table += `
-        <td class="${result ? 'true':'false'}">
-        ${result ? 'V':'F'}
-        </td>
-        `;
-
-        table += "</tr>";
-
-    }
-
-    table += "</table>";
-
-    document.getElementById("tableContainer").innerHTML = table;
-
-    generateSteps(formula);
-
-}
-
-function generateSteps(formula){
-
-    let html = "";
-
-    if(formula.includes("&")){
-
-        html += `
-        <div class="step">
-        🟢 AND (&): ambas deben ser verdaderas.
         </div>
-        `;
 
-    }
+        <!-- INPUT -->
 
-    if(formula.includes("|")){
+        <textarea id="formula"></textarea>
 
-        html += `
-        <div class="step">
-        🔵 OR (|): basta con una verdadera.
+        <!-- BOTONES DE CONECTIVAS -->
+
+        <div class="symbols">
+
+            <button class="symbolBtn" onclick="insertSymbol('∧')">∧</button>
+            <button class="symbolBtn" onclick="insertSymbol('∨')">∨</button>
+            <button class="symbolBtn" onclick="insertSymbol('¬')">¬</button>
+            <button class="symbolBtn" onclick="insertSymbol('→')">→</button>
+            <button class="symbolBtn" onclick="insertSymbol('↔')">↔</button>
+            <button class="symbolBtn" onclick="insertSymbol('(')">(</button>
+            <button class="symbolBtn" onclick="insertSymbol(')')">)</button>
+
         </div>
-        `;
 
-    }
+        <!-- ACCIONES -->
 
-    if(formula.includes("!")){
+        <div class="buttons">
 
-        html += `
-        <div class="step">
-        🟡 NOT (!): cambia verdadero por falso.
+            <button onclick="generateTruthTable()">
+                📊 Generar Tabla
+            </button>
+
+            <button onclick="startGuidedMode()">
+                🧩 Resolver Conmigo
+            </button>
+
         </div>
-        `;
 
-    }
+        <div class="progress" id="progress"></div>
 
-    if(formula.includes(">")){
+        <div id="steps"></div>
 
-        html += `
-        <div class="step">
-        🟣 CONDICIONAL (>): solo es falsa cuando V → F.
-        </div>
-        `;
+        <div id="questionArea"></div>
 
-    }
+        <div id="feedback"></div>
 
-    document.getElementById("steps").innerHTML = html;
-
-}
-
-function startGuidedMode(){
-
-    const formula = document.getElementById("formula").value;
-
-    const vars = getVariables(formula);
-
-    const rows = Math.pow(2, vars.length);
-
-    guidedRows = [];
-
-    for(let i=0; i<rows; i++){
-
-        let values = {};
-
-        vars.forEach((v,index)=>{
-
-            values[v] = !Boolean((i >> (vars.length-index-1)) & 1);
-
-        });
-
-        let result = evaluateExpression(formula, values);
-
-        guidedRows.push({
-            values,
-            result
-        });
-
-    }
-
-    currentRow = 0;
-
-    askQuestion();
-
-}
-
-function askQuestion(){
-
-    if(currentRow >= guidedRows.length){
-
-        document.getElementById("questionArea").innerHTML = `
-        <div class="step">
-        🎉 ¡Excelente trabajo! Has completado todos los ejercicios.
-        </div>
-        `;
-
-        document.getElementById("progress").innerHTML = "";
-
-        return;
-
-    }
-
-    let formula = document.getElementById("formula").value;
-
-    let row = guidedRows[currentRow];
-
-    currentAnswer = row.result;
-
-    let valuesText = "";
-
-    for(let key in row.values){
-
-        valuesText += `
-        <div>
-        <b>${key}</b> =
-        ${row.values[key] ? '🟩 Verdadero':'🟦 Falso'}
-        </div>
-        `;
-
-    }
-
-    document.getElementById("progress").innerHTML = `
-    Ejercicio ${currentRow + 1} de ${guidedRows.length}
-    `;
-
-    document.getElementById("questionArea").innerHTML = `
-
-    <div class="question">
-
-    ${valuesText}
-
-    <br>
-
-    ¿Cuál es el resultado de:
-
-    <br><br>
-
-    <b>${formula}</b>
-
-    ?
-
-    <div class="answerButtons">
-
-    <button onclick="checkAnswer(true)">
-    🟩 Verdadero
-    </button>
-
-    <button onclick="checkAnswer(false)">
-    🟦 Falso
-    </button>
+        <div id="tableContainer"></div>
 
     </div>
 
-    </div>
-
-    `;
-
-}
-
-function checkAnswer(answer){
-
-    let feedback = document.getElementById("feedback");
-
-    if(answer === currentAnswer){
-
-        feedback.innerHTML = `
-        <div class="feedback correct">
-        ✅ ¡Muy bien!
-        </div>
-        `;
-
-    }else{
-
-        feedback.innerHTML = `
-        <div class="feedback wrong">
-        ❌ Intenta nuevamente observando los valores.
-        </div>
-        `;
-
-        return;
-
-    }
-
-    currentRow++;
-
-    setTimeout(()=>{
-
-        askQuestion();
-
-    },1500);
-
-}
-
-</script>
+    <script src="script.js"></script>
 
 </body>
+
 </html>
