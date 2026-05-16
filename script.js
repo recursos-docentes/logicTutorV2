@@ -2,6 +2,96 @@ let guidedRows = [];
 let currentRow = 0;
 let currentAnswer = false;
 
+function extractSubformulas(expr){
+
+    let subformulas = [];
+
+    function recursiveExtract(expression){
+
+        expression = expression.trim();
+
+        // eliminar paréntesis externos innecesarios
+        if(
+            expression.startsWith("(") &&
+            expression.endsWith(")")
+        ){
+
+            let balance = 0;
+            let valid = true;
+
+            for(let i = 0; i < expression.length - 1; i++){
+
+                if(expression[i] === "(") balance++;
+                if(expression[i] === ")") balance--;
+
+                if(balance === 0){
+                    valid = false;
+                    break;
+                }
+
+            }
+
+            if(valid){
+
+                expression = expression.slice(1,-1);
+
+            }
+
+        }
+
+        // NEGACIÓN
+        if(expression.startsWith("¬")){
+
+            let inner = expression.slice(1);
+
+            recursiveExtract(inner);
+
+            subformulas.push("¬" + inner);
+
+            return;
+
+        }
+
+        // buscar operador principal respetando precedencia
+        let operators = ["↔","→","∨","∧"];
+
+        for(let op of operators){
+
+            let balance = 0;
+
+            for(let i = 0; i < expression.length; i++){
+
+                let char = expression[i];
+
+                if(char === "(") balance++;
+                if(char === ")") balance--;
+
+                if(balance === 0 && char === op){
+
+                    let left = expression.slice(0,i);
+                    let right = expression.slice(i+1);
+
+                    recursiveExtract(left);
+                    recursiveExtract(right);
+
+                    subformulas.push(left + op + right);
+
+                    return;
+
+                }
+
+            }
+
+        }
+
+    }
+
+    recursiveExtract(expr);
+
+    return [...new Set(subformulas)];
+
+}
+
 function insertSymbol(symbol){
 
     let textarea = document.getElementById("formula");
