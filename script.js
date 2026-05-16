@@ -1,6 +1,8 @@
 let guidedRows = [];
 let currentRow = 0;
 let currentAnswer = false;
+let currentStep = 0;
+let currentSteps = [];
 
 function extractSubformulas(expr){
 
@@ -324,7 +326,6 @@ function startGuidedMode(){
 
         let values = {};
 
-        // VARIABLES BASE
         vars.forEach((v,index)=>{
 
             values[v] = !Boolean(
@@ -333,10 +334,8 @@ function startGuidedMode(){
 
         });
 
-        // GUARDAR PASOS
         let steps = [];
 
-        // RESOLVER SUBFÓRMULAS
         subformulas.forEach(sub=>{
 
             let result = solveSubformula(sub, values);
@@ -346,26 +345,142 @@ function startGuidedMode(){
                 result: result
             });
 
-            // guardar resultado temporal
-            values[sub] = result;
-
         });
 
         guidedRows.push({
 
-            vars: {...values},
-            steps: steps,
-            finalResult: steps[steps.length - 1].result
+            vars: values,
+            steps: steps
 
         });
 
     }
 
     currentRow = 0;
+    currentStep = 0;
 
-    askQuestion();
+    showStep();
 
 }
+
+function showStep(){
+
+    let row = guidedRows[currentRow];
+
+    let step = row.steps[currentStep];
+
+    currentAnswer = step.result;
+
+    let valuesText = "";
+
+    for(let key in row.vars){
+
+        valuesText += `
+        <div>
+            <b>${key}</b> =
+            ${row.vars[key] ? '🟩 Verdadero' : '🟦 Falso'}
+        </div>
+        `;
+
+    }
+
+    document.getElementById("progress").innerHTML = `
+    Fila ${currentRow + 1} de ${guidedRows.length}
+    ·
+    Paso ${currentStep + 1} de ${row.steps.length}
+    `;
+
+    document.getElementById("questionArea").innerHTML = `
+
+    <div class="question">
+
+        ${valuesText}
+
+        <br>
+
+        Resuelve:
+
+        <br><br>
+
+        <div class="step current">
+
+            <b>${step.formula}</b>
+
+        </div>
+
+        <div class="answerButtons">
+
+            <button onclick="checkStepAnswer(true)">
+                🟩 Verdadero
+            </button>
+
+            <button onclick="checkStepAnswer(false)">
+                🟦 Falso
+            </button>
+
+        </div>
+
+    </div>
+
+    `;
+
+}
+
+function checkStepAnswer(answer){
+
+    let feedback = document.getElementById("feedback");
+
+    if(answer === currentAnswer){
+
+        feedback.innerHTML = `
+        <div class="feedback correct">
+        ✅ ¡Correcto!
+        </div>
+        `;
+
+        currentStep++;
+
+        let row = guidedRows[currentRow];
+
+        // siguiente fila
+        if(currentStep >= row.steps.length){
+
+            currentStep = 0;
+            currentRow++;
+
+        }
+
+        // terminó todo
+        if(currentRow >= guidedRows.length){
+
+            document.getElementById("questionArea").innerHTML = `
+            <div class="step">
+            🎉 ¡Excelente trabajo!
+            </div>
+            `;
+
+            return;
+
+        }
+
+        setTimeout(()=>{
+
+            showStep();
+
+        },1000);
+
+    }else{
+
+        feedback.innerHTML = `
+        <div class="feedback wrong">
+        ❌ Intenta nuevamente.
+        </div>
+        `;
+
+    }
+
+}
+
 
 function askQuestion(){
 
