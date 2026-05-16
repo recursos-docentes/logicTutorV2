@@ -312,23 +312,46 @@ function startGuidedMode(){
 
     const rows = Math.pow(2, vars.length);
 
+    let subformulas = extractSubformulas(formula);
+
+    subformulas = subformulas.filter(
+        f => !/^[a-z]$/i.test(f)
+    );
+
     guidedRows = [];
 
-    for(let i=0; i<rows; i++){
+    for(let i = 0; i < rows; i++){
 
         let values = {};
 
+        // VARIABLES
         vars.forEach((v,index)=>{
 
-            values[v] = !Boolean((i >> (vars.length-index-1)) & 1);
+            values[v] = !Boolean(
+                (i >> (vars.length-index-1)) & 1
+            );
 
         });
 
-        let result = evaluateExpression(formula, values);
+        // resolver TODAS las subfórmulas
+        let results = {};
+
+        subformulas.forEach(sub=>{
+
+            let result = solveSubformula(sub, values);
+
+            results[sub] = result;
+
+            values[sub] = result;
+
+        });
 
         guidedRows.push({
-            values,
-            result
+
+            values: {...values},
+            results: results,
+            finalResult: results[subformulas[subformulas.length - 1]]
+
         });
 
     }
@@ -359,19 +382,37 @@ function askQuestion(){
 
     let row = guidedRows[currentRow];
 
-    currentAnswer = row.result;
+    currentAnswer = row.finalResult;
 
     let valuesText = "";
 
     for(let key in row.values){
 
-        valuesText += `
-        <div>
-        <b>${key}</b> =
-        ${row.values[key] ? '🟩 Verdadero':'🟦 Falso'}
+        // mostrar solo variables simples
+        if(/^[a-z]$/i.test(key)){
+
+            valuesText += `
+            <div>
+            <b>${key}</b> =
+            ${row.values[key] ? '🟩 Verdadero':'🟦 Falso'}
+            </div>
+            `;
+
+        }
+
+    }
+
+    // mostrar subfórmulas
+    let stepsText = "";
+
+    for(let sub in row.results){
+
+        stepsText += `
+        <div class="step">
+        <b>${sub}</b> =
+        ${row.results[sub] ? '🟩 V':'🟦 F'}
         </div>
         `;
-
     }
 
     document.getElementById("progress").innerHTML = `
@@ -386,11 +427,19 @@ function askQuestion(){
 
     <br>
 
-    ¿Cuál es el resultado de:
+    <b>Resolución paso a paso:</b>
+
+    ${stepsText}
+
+    <br>
+
+    Entonces:
 
     <br><br>
 
     <b>${formula}</b>
+
+    =
 
     ?
 
