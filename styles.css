@@ -218,22 +218,29 @@ textarea{
         font-size:16px;
     }
 
-  .instructions-image{
+ .instructions-image{
     display:flex;
     justify-content:center;
-    margin-bottom:25px;
+    align-items:center;
+    margin-bottom:20px;
+    overflow:hidden;
+}
+
+    .instructions-image{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    margin-bottom:20px;
+    overflow:hidden;
 }
 
 .instructions-image img{
-    width:85%;
-    max-width:900px;
-    border-radius:20px;
-    box-shadow:0 0 10px rgba(0,0,0,0.08);
-}
-.instructions-image img{
-    width:100%;
-    border-radius:20px;
-    box-shadow:0 0 10px rgba(0,0,0,0.1);
+    width:70%;
+    max-width:700px;
+    height:auto;
+    display:block;
+    border-radius:18px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.08);
 }
 
 }
