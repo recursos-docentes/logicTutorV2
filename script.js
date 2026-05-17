@@ -1,4 +1,7 @@
 let guidedRows = [];
+let guidedTable = {};
+let currentColumn = 0;
+let currentRowInColumn = 0;
 let currentAnswer = false;
 let guidedTable = {};
 let currentColumn = 0;
@@ -373,7 +376,7 @@ function startGuidedMode(){
 
     const vars = getVariables(formula);
 
-    const rows = Math.pow(2, vars.length);
+    const rowsCount = Math.pow(2, vars.length);
 
     let subformulas = extractSubformulas(formula);
 
@@ -381,48 +384,169 @@ function startGuidedMode(){
         f => !/^[a-z]$/i.test(f)
     );
 
-    guidedRows = [];
+    let columns = [...vars, ...subformulas];
 
-    for(let i = 0; i < rows; i++){
+    let rows = [];
 
-        let values = {};
+    for(let i = 0; i < rowsCount; i++){
+
+        let row = {};
 
         vars.forEach((v,index)=>{
 
-            values[v] = !Boolean(
+            row[v] = !Boolean(
                 (i >> (vars.length-index-1)) & 1
             );
 
         });
 
-        let steps = [];
-
-        subformulas.forEach(sub=>{
-
-            let result = solveSubformula(sub, values);
-
-            steps.push({
-                formula: sub,
-                result: result
-            });
-
-        });
-
-        guidedRows.push({
-
-            vars: values,
-            steps: steps
-
-        });
+        rows.push(row);
 
     }
 
-    currentRow = 0;
-    currentStep = 0;
+    guidedTable = {
+        formula,
+        vars,
+        subformulas,
+        columns,
+        rows
+    };
 
-    showStep();
+    currentColumn = vars.length;
+    currentRowInColumn = 0;
+
+    renderGuidedTable();
+
+    showColumnQuestion();
 
 }
+
+function showColumnQuestion(){
+
+    let currentFormula =
+        guidedTable.columns[currentColumn];
+
+    let row =
+        guidedTable.rows[currentRowInColumn];
+
+    let result =
+        solveSubformula(currentFormula, row);
+
+    currentAnswer = result;
+
+    document.getElementById("progress").innerHTML = `
+    Resolviendo columna:
+    <b>${currentFormula}</b>
+    <br>
+    Fila ${currentRowInColumn + 1}
+    de
+    ${guidedTable.rows.length}
+    `;
+
+    document.getElementById("questionArea").innerHTML = `
+
+    <div class="question">
+
+        <h3>
+        Resolver:
+        ${currentFormula}
+        </h3>
+
+        <div>
+
+        ${guidedTable.vars.map(v=>`
+
+            <p>
+            <b>${v}</b> =
+            ${row[v] ? '🟩 V':'🟦 F'}
+            </p>
+
+        `).join("")}
+
+        </div>
+
+        <div class="answerButtons">
+
+            <button onclick="checkColumnAnswer(true)">
+                🟩 Verdadero
+            </button>
+
+            <button onclick="checkColumnAnswer(false)">
+                🟦 Falso
+            </button>
+
+        </div>
+
+    </div>
+
+    `;
+
+}
+
+function checkColumnAnswer(answer){
+
+    let currentFormula =
+        guidedTable.columns[currentColumn];
+
+    let row =
+        guidedTable.rows[currentRowInColumn];
+
+    let correct =
+        solveSubformula(currentFormula, row);
+
+    if(answer === correct){
+
+        // guardar respuesta
+        row[currentFormula] = answer;
+
+        // REDIBUJAR TABLA
+        renderGuidedTable();
+
+        currentRowInColumn++;
+
+        // terminó columna
+        if(
+            currentRowInColumn >=
+            guidedTable.rows.length
+        ){
+
+            currentRowInColumn = 0;
+
+            currentColumn++;
+
+        }
+
+        // terminó todo
+        if(
+            currentColumn >=
+            guidedTable.columns.length
+        ){
+
+            document.getElementById("questionArea").innerHTML = `
+            <div class="step">
+            🎉 ¡Tabla completada!
+            </div>
+            `;
+
+            return;
+
+        }
+
+        showColumnQuestion();
+
+    }else{
+
+        document.getElementById("feedback").innerHTML = `
+        <div class="feedback wrong">
+        ❌ Intenta nuevamente
+        </div>
+        `;
+
+    }
+
+}
+
+
 
 function showStep(){
 
