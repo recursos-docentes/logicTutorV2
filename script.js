@@ -408,9 +408,8 @@ function renderGuidedTable(){
     let currentFormula =
         guidedTable.columns[currentColumn];
 
-    // variables usadas en esta fórmula
     let dependencies =
-        getVariables(currentFormula);
+        getDirectDependencies(currentFormula);
 
     let html = "<table><tr>";
 
@@ -418,7 +417,7 @@ function renderGuidedTable(){
 
         let className = "";
 
-        // columnas necesarias
+        // dependencias reales
         if(dependencies.includes(col)){
 
             className = "dependencyColumn";
@@ -444,7 +443,7 @@ function renderGuidedTable(){
 
 
 
-    guidedTable.rows.forEach((row)=>{
+    guidedTable.rows.forEach(row=>{
 
         html += "<tr>";
 
@@ -454,14 +453,12 @@ function renderGuidedTable(){
 
             let className = "";
 
-            // columnas necesarias
             if(dependencies.includes(col)){
 
                 className = "dependencyColumn";
 
             }
 
-            // columna actual
             if(index === currentColumn){
 
                 className = "currentColumn";
@@ -592,9 +589,16 @@ function showColumnQuestion(){
 
 // VALIDAR RESPUESTA
 
+
 function checkColumnAnswer(answer){
 
+    let feedback =
+        document.getElementById("feedback");
+
     if(answer === currentAnswer){
+
+        // LIMPIAR MENSAJE
+        feedback.innerHTML = "";
 
         let formula =
             guidedTable.columns[currentColumn];
@@ -606,7 +610,7 @@ function checkColumnAnswer(answer){
 
         currentRowInColumn++;
 
-        // siguiente columna
+        // terminar columna
         if(
             currentRowInColumn >=
             guidedTable.rows.length
@@ -618,7 +622,7 @@ function checkColumnAnswer(answer){
 
         }
 
-        // terminó
+        // terminó toda la tabla
         if(
             currentColumn >=
             guidedTable.columns.length
@@ -642,9 +646,7 @@ function checkColumnAnswer(answer){
 
     }else{
 
-        document.getElementById(
-            "feedback"
-        ).innerHTML = `
+        feedback.innerHTML = `
 
         <div class="feedback wrong">
             ❌ Intenta nuevamente
@@ -653,5 +655,80 @@ function checkColumnAnswer(answer){
         `;
 
     }
+
+}
+
+function getDirectDependencies(expr){
+
+    expr = expr.trim();
+
+    // quitar paréntesis externos
+    if(
+        expr.startsWith("(") &&
+        expr.endsWith(")")
+    ){
+
+        let balance = 0;
+        let valid = true;
+
+        for(let i=0; i<expr.length-1; i++){
+
+            if(expr[i] === "(") balance++;
+            if(expr[i] === ")") balance--;
+
+            if(balance === 0){
+
+                valid = false;
+                break;
+
+            }
+
+        }
+
+        if(valid){
+
+            expr = expr.slice(1,-1);
+
+        }
+
+    }
+
+    // NEGACIÓN
+    if(expr.startsWith("¬")){
+
+        return [expr.slice(1)];
+
+    }
+
+    let operators = ["↔","→","∨","∧"];
+
+    for(let op of operators){
+
+        let balance = 0;
+
+        for(let i=0; i<expr.length; i++){
+
+            if(expr[i] === "(") balance++;
+            if(expr[i] === ")") balance--;
+
+            if(balance === 0 && expr[i] === op){
+
+                let left =
+                    expr.slice(0,i).trim();
+
+                let right =
+                    expr.slice(i+1).trim();
+
+                return [left,right];
+
+            }
+
+        }
+
+    }
+
+    return [expr];
+
+}
 
 }
