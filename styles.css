@@ -307,4 +307,12 @@ td{
         flex-direction:column;
     }
 
+    .dependencyColumn{
+    background:#fff5bf;
+}
+
+.currentColumn{
+    background:#ffdede;
+}
+
 }
