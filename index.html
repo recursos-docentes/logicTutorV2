@@ -2,11 +2,16 @@
 <html lang="es">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
     <title>Logic Tutor</title>
 
     <link rel="stylesheet" href="styles.css">
+
 </head>
 
 <body>
@@ -19,103 +24,174 @@
             Aprende tablas de verdad paso a paso
         </p>
 
-        <!-- CONECTIVAS -->
+        <!-- IMAGEN -->
 
-      <div class="instructions-image">
+        <div class="instructions-image">
 
-    <img src="conectivas.png" alt="Conectivas Lógicas">
+            <img src="conectivas.png"
+                alt="Conectivas Lógicas">
 
-</div>
+        </div>
+
         <!-- INPUT -->
 
-        <textarea id="formula"></textarea>
+        <textarea
+            id="formula"
+            spellcheck="false"
+            placeholder="Ejemplo: ((p∨q)→¬r)">
+        </textarea>
 
-        <!-- BOTONES DE CONECTIVAS -->
+        <!-- BOTONES -->
 
-     <div class="symbols">
+        <div class="symbols">
 
-    <!-- VARIABLES -->
+            <!-- VARIABLES -->
 
-    <button class="symbolBtn variableBtn"
-        onclick="insertSymbol('p')">
-        p
-    </button>
+            <button
+                type="button"
+                class="symbolBtn variableBtn"
+                onclick="insertSymbol('p')">
 
-    <button class="symbolBtn variableBtn"
-        onclick="insertSymbol('q')">
-        q
-    </button>
+                p
 
-    <button class="symbolBtn variableBtn"
-        onclick="insertSymbol('r')">
-        r
-    </button>
+            </button>
 
-    <button class="symbolBtn variableBtn"
-        onclick="insertSymbol('s')">
-        s
-    </button>
+            <button
+                type="button"
+                class="symbolBtn variableBtn"
+                onclick="insertSymbol('q')">
 
-    <!-- CONECTIVAS -->
+                q
 
-    <button class="symbolBtn"
-        onclick="insertSymbol('∧')">
-        ∧
-    </button>
+            </button>
 
-    <button class="symbolBtn"
-        onclick="insertSymbol('∨')">
-        ∨
-    </button>
+            <button
+                type="button"
+                class="symbolBtn variableBtn"
+                onclick="insertSymbol('r')">
 
-    <button class="symbolBtn"
-        onclick="insertSymbol('¬')">
-        ¬
-    </button>
+                r
 
-    <button class="symbolBtn"
-        onclick="insertSymbol('→')">
-        →
-    </button>
+            </button>
 
-    <button class="symbolBtn"
-        onclick="insertSymbol('↔')">
-        ↔
-    </button>
+            <button
+                type="button"
+                class="symbolBtn variableBtn"
+                onclick="insertSymbol('s')">
 
-    <button class="symbolBtn"
-        onclick="insertSymbol('(')">
-        (
-    </button>
+                s
 
-    <button class="symbolBtn"
-        onclick="insertSymbol(')')">
-        )
-    </button>
+            </button>
 
-</div>
+            <!-- CONECTIVAS -->
+
+            <button
+                type="button"
+                class="symbolBtn"
+                onclick="insertSymbol('∧')">
+
+                ∧
+
+            </button>
+
+            <button
+                type="button"
+                class="symbolBtn"
+                onclick="insertSymbol('∨')">
+
+                ∨
+
+            </button>
+
+            <button
+                type="button"
+                class="symbolBtn"
+                onclick="insertSymbol('¬')">
+
+                ¬
+
+            </button>
+
+            <button
+                type="button"
+                class="symbolBtn"
+                onclick="insertSymbol('→')">
+
+                →
+
+            </button>
+
+            <button
+                type="button"
+                class="symbolBtn"
+                onclick="insertSymbol('↔')">
+
+                ↔
+
+            </button>
+
+            <button
+                type="button"
+                class="symbolBtn"
+                onclick="insertSymbol('(')">
+
+                (
+
+            </button>
+
+            <button
+                type="button"
+                class="symbolBtn"
+                onclick="insertSymbol(')')">
+
+                )
+
+            </button>
+
+        </div>
 
         <!-- ACCIONES -->
 
         <div class="buttons">
 
-            <button onclick="generateTruthTable()">
+            <button
+                type="button"
+                onclick="generateTruthTable()">
+
                 📊 Generar Tabla
+
             </button>
 
-            <button onclick="startGuidedMode()">
+            <button
+                type="button"
+                onclick="startGuidedMode()">
+
                 🧩 Resolver Conmigo
+
             </button>
 
         </div>
 
-        <div class="progress" id="progress"></div>
+        <!-- PROGRESO -->
+
+        <div
+            class="progress"
+            id="progress">
+        </div>
+
+        <!-- PASOS -->
 
         <div id="steps"></div>
 
+        <!-- PREGUNTAS -->
+
         <div id="questionArea"></div>
 
+        <!-- FEEDBACK -->
+
         <div id="feedback"></div>
+
+        <!-- TABLA -->
 
         <div id="tableContainer"></div>
 
