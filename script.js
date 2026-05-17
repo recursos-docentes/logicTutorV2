@@ -43,6 +43,18 @@ function getVariables(expr){
 
 }
 
+function getDependencies(expr){
+
+    let deps = expr.match(/[a-z]+|¬[a-z]+|\([^)]+\)|[a-z]/g);
+
+    if(!deps) return [];
+
+    let vars = expr.match(/[a-z]/g);
+
+    return [...new Set(vars)];
+
+}
+
 
 
 // EXTRAER SUBFÓRMULAS
@@ -393,17 +405,35 @@ function startGuidedMode(){
 
 function renderGuidedTable(){
 
+    let currentFormula =
+        guidedTable.columns[currentColumn];
+
+    // variables usadas en esta fórmula
+    let dependencies =
+        getVariables(currentFormula);
+
     let html = "<table><tr>";
 
     guidedTable.columns.forEach((col,index)=>{
 
-        let active =
-            index === currentColumn
-            ? 'style="background:#ffeaa7;"'
-            : "";
+        let className = "";
+
+        // columnas necesarias
+        if(dependencies.includes(col)){
+
+            className = "dependencyColumn";
+
+        }
+
+        // columna actual
+        if(index === currentColumn){
+
+            className = "currentColumn";
+
+        }
 
         html += `
-        <th ${active}>
+        <th class="${className}">
             ${col}
         </th>
         `;
@@ -412,7 +442,9 @@ function renderGuidedTable(){
 
     html += "</tr>";
 
-    guidedTable.rows.forEach(row=>{
+
+
+    guidedTable.rows.forEach((row)=>{
 
         html += "<tr>";
 
@@ -420,10 +452,21 @@ function renderGuidedTable(){
 
             let value = row[col];
 
-            let active =
-                index === currentColumn
-                ? 'style="background:#fff8d6;"'
-                : "";
+            let className = "";
+
+            // columnas necesarias
+            if(dependencies.includes(col)){
+
+                className = "dependencyColumn";
+
+            }
+
+            // columna actual
+            if(index === currentColumn){
+
+                className = "currentColumn";
+
+            }
 
             let text = "?";
 
@@ -434,7 +477,7 @@ function renderGuidedTable(){
             }
 
             html += `
-            <td ${active}>
+            <td class="${className}">
                 ${text}
             </td>
             `;
@@ -452,7 +495,6 @@ function renderGuidedTable(){
     ).innerHTML = html;
 
 }
-
 
 
 // PREGUNTA ACTUAL
