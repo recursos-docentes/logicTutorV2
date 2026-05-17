@@ -510,6 +510,10 @@ function showColumnQuestion(){
     currentAnswer =
         solveSubformula(formula, row);
 
+    // VARIABLES NECESARIAS
+    let dependencies =
+        getVariables(formula);
+
     document.getElementById(
         "progress"
     ).innerHTML = `
@@ -536,14 +540,28 @@ function showColumnQuestion(){
             ${formula}
         </h3>
 
-        ${guidedTable.vars.map(v=>`
+        <div class="variablesRow">
 
-            <p>
-                <b>${v}</b> =
-                ${row[v] ? '🟩 V':'🟦 F'}
-            </p>
+            ${dependencies.map(v=>`
 
-        `).join("")}
+                <div class="variableBox">
+
+                    <span class="variableName">
+                        ${v}
+                    </span>
+
+                    <span class="
+                        variableValue
+                        ${row[v] ? 'valueTrue':'valueFalse'}
+                    ">
+                        ${row[v] ? 'V':'F'}
+                    </span>
+
+                </div>
+
+            `).join("")}
+
+        </div>
 
         <div class="answerButtons">
 
@@ -570,7 +588,6 @@ function showColumnQuestion(){
     `;
 
 }
-
 
 
 // VALIDAR RESPUESTA
