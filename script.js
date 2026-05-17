@@ -101,9 +101,22 @@ function extractSubformulas(expr){
 
 function insertSymbol(symbol){
 
-    let textarea = document.getElementById("formula");
+    const textarea =
+        document.getElementById("formula");
 
-    textarea.value += symbol;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+
+    textarea.value =
+        textarea.value.substring(0, start)
+        + symbol +
+        textarea.value.substring(end);
+
+    textarea.focus();
+
+    textarea.selectionStart =
+    textarea.selectionEnd =
+        start + symbol.length;
 
 }
 
