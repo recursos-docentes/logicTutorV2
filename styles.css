@@ -218,7 +218,49 @@ td{
     font-size:28px;
 }
 
+.variablesRow{
+    display:flex;
+    gap:30px;
+    flex-wrap:wrap;
+    align-items:center;
+    margin-top:20px;
+    margin-bottom:20px;
+}
 
+.variableBox{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    background:white;
+    padding:10px 16px;
+    border-radius:14px;
+    box-shadow:0 2px 6px rgba(0,0,0,0.08);
+}
+
+.variableName{
+    font-size:28px;
+    font-weight:bold;
+}
+
+.variableValue{
+    width:45px;
+    height:45px;
+    border-radius:12px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:white;
+    font-size:24px;
+    font-weight:bold;
+}
+
+.valueTrue{
+    background:#49c774;
+}
+
+.valueFalse{
+    background:#4a7dff;
+}
 
 /* BOTONES RESPUESTA */
 
