@@ -178,6 +178,14 @@ td{
     font-weight:bold;
 }
 
+.dependencyColumn{
+    background:#fff5bf;
+}
+
+.currentColumn{
+    background:#ffdede;
+}
+
 
 
 /* PREGUNTA */
@@ -307,12 +315,5 @@ td{
         flex-direction:column;
     }
 
-    .dependencyColumn{
-    background:#fff5bf;
-}
-
-.currentColumn{
-    background:#ffdede;
-}
-
+  
 }
