@@ -18,22 +18,29 @@
 
     <div class="container">
 
+        <!-- TÍTULO -->
+
         <h1>🧠 Logic Tutor</h1>
 
         <p class="subtitle">
             Aprende tablas de verdad paso a paso
         </p>
 
+
+
         <!-- IMAGEN -->
 
         <div class="instructions-image">
 
-            <img src="conectivas.png"
+            <img
+                src="conectivas.png"
                 alt="Conectivas Lógicas">
 
         </div>
 
-        <!-- INPUT -->
+
+
+        <!-- ENTRADA -->
 
         <textarea
             id="formula"
@@ -41,7 +48,9 @@
             placeholder="Ejemplo: ((p∨q)→¬r)">
         </textarea>
 
-        <!-- BOTONES -->
+
+
+        <!-- BOTONES DE SÍMBOLOS -->
 
         <div class="symbols">
 
@@ -50,7 +59,7 @@
             <button
                 type="button"
                 class="symbolBtn variableBtn"
-                onclick="insertSymbol('p')">
+                onclick="insertSymbol('p'); return false;">
 
                 p
 
@@ -59,7 +68,7 @@
             <button
                 type="button"
                 class="symbolBtn variableBtn"
-                onclick="insertSymbol('q')">
+                onclick="insertSymbol('q'); return false;">
 
                 q
 
@@ -68,7 +77,7 @@
             <button
                 type="button"
                 class="symbolBtn variableBtn"
-                onclick="insertSymbol('r')">
+                onclick="insertSymbol('r'); return false;">
 
                 r
 
@@ -77,18 +86,20 @@
             <button
                 type="button"
                 class="symbolBtn variableBtn"
-                onclick="insertSymbol('s')">
+                onclick="insertSymbol('s'); return false;">
 
                 s
 
             </button>
+
+
 
             <!-- CONECTIVAS -->
 
             <button
                 type="button"
                 class="symbolBtn"
-                onclick="insertSymbol('∧')">
+                onclick="insertSymbol('∧'); return false;">
 
                 ∧
 
@@ -97,7 +108,7 @@
             <button
                 type="button"
                 class="symbolBtn"
-                onclick="insertSymbol('∨')">
+                onclick="insertSymbol('∨'); return false;">
 
                 ∨
 
@@ -106,7 +117,7 @@
             <button
                 type="button"
                 class="symbolBtn"
-                onclick="insertSymbol('¬')">
+                onclick="insertSymbol('¬'); return false;">
 
                 ¬
 
@@ -115,7 +126,7 @@
             <button
                 type="button"
                 class="symbolBtn"
-                onclick="insertSymbol('→')">
+                onclick="insertSymbol('→'); return false;">
 
                 →
 
@@ -124,7 +135,7 @@
             <button
                 type="button"
                 class="symbolBtn"
-                onclick="insertSymbol('↔')">
+                onclick="insertSymbol('↔'); return false;">
 
                 ↔
 
@@ -133,7 +144,7 @@
             <button
                 type="button"
                 class="symbolBtn"
-                onclick="insertSymbol('(')">
+                onclick="insertSymbol('('); return false;">
 
                 (
 
@@ -142,7 +153,7 @@
             <button
                 type="button"
                 class="symbolBtn"
-                onclick="insertSymbol(')')">
+                onclick="insertSymbol(')'); return false;">
 
                 )
 
@@ -150,13 +161,15 @@
 
         </div>
 
+
+
         <!-- ACCIONES -->
 
         <div class="buttons">
 
             <button
                 type="button"
-                onclick="generateTruthTable()">
+                onclick="generateTruthTable(); return false;">
 
                 📊 Generar Tabla
 
@@ -164,13 +177,15 @@
 
             <button
                 type="button"
-                onclick="startGuidedMode()">
+                onclick="startGuidedMode(); return false;">
 
                 🧩 Resolver Conmigo
 
             </button>
 
         </div>
+
+
 
         <!-- PROGRESO -->
 
@@ -179,23 +194,29 @@
             id="progress">
         </div>
 
-        <!-- PASOS -->
 
-        <div id="steps"></div>
 
         <!-- PREGUNTAS -->
 
         <div id="questionArea"></div>
 
+
+
         <!-- FEEDBACK -->
 
         <div id="feedback"></div>
+
+
 
         <!-- TABLA -->
 
         <div id="tableContainer"></div>
 
     </div>
+
+
+
+    <!-- SCRIPT -->
 
     <script src="script.js"></script>
 
