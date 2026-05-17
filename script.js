@@ -1,6 +1,8 @@
 let guidedRows = [];
-let currentRow = 0;
 let currentAnswer = false;
+let guidedTable = {};
+let currentColumn = 0;
+let currentRow = 0;
 let currentStep = 0;
 let currentSteps = [];
 
@@ -227,6 +229,65 @@ function solveSubformula(expr, values){
     return values[expr];
 
 }
+
+function renderGuidedTable(){
+
+    let html = "<table><tr>";
+
+    // encabezados
+    guidedTable.columns.forEach((col,index)=>{
+
+        let active = index === currentColumn
+            ? 'style="background:#ffeaa7;"'
+            : "";
+
+        html += `<th ${active}>${col}</th>`;
+
+    });
+
+    html += "</tr>";
+
+    // filas
+    guidedTable.rows.forEach((row,rowIndex)=>{
+
+        html += "<tr>";
+
+        guidedTable.columns.forEach((col,colIndex)=>{
+
+            let value = row[col];
+
+            let active = colIndex === currentColumn
+                ? 'style="background:#fff8d6;"'
+                : "";
+
+            if(value === undefined){
+
+                value = "?";
+
+            }else{
+
+                value = value ? "V" : "F";
+
+            }
+
+            html += `
+            <td ${active}>
+                ${value}
+            </td>
+            `;
+
+        });
+
+        html += "</tr>";
+
+    });
+
+    html += "</table>";
+
+    document.getElementById("tableContainer").innerHTML = html;
+
+}
+
 
 function generateTruthTable(){
 
