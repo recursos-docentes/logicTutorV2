@@ -746,30 +746,28 @@ function renderGuidedTable(){
 
     guidedTable.columns.forEach((col,index)=>{
 
-        let classes = [];
+        let className = "";
 
         // columnas necesarias
         if(
             dependencies.includes(col)
         ){
 
-            classes.push(
-                "dependencyColumn"
-            );
+            className +=
+                " dependencyColumn";
 
         }
 
         // columna actual
         if(index === currentColumn){
 
-            classes.push(
-                "currentColumn"
-            );
+            className +=
+                " currentColumn";
 
         }
 
         html += `
-        <th class="${classes.join(" ")}">
+        <th class="${className}">
             ${col}
         </th>
         `;
@@ -790,57 +788,56 @@ function renderGuidedTable(){
 
         guidedTable.columns.forEach((col,index)=>{
 
-            let classes = [];
+            let className = "";
 
             // dependencias
             if(
                 dependencies.includes(col)
             ){
 
-                classes.push(
-                    "dependencyColumn"
-                );
+                className +=
+                    " dependencyColumn";
 
             }
 
             // columna actual
             if(index === currentColumn){
 
-                classes.push(
-                    "currentColumn"
-                );
+                className +=
+                    " currentColumn";
 
             }
 
-            // fila activa
-           // iluminar SOLO celdas usadas
-if(
-    rowIndex === currentRowInColumn &&
-    currentColumn <
-    guidedTable.columns.length
-){
+            // =========================
+            // SOLO CELDAS ACTIVAS
+            // =========================
 
-    // dependencias usadas
-    if(
-        dependencies.includes(col)
-    ){
+            if(
+                rowIndex === currentRowInColumn
+            ){
 
-        classes.push(
-            "activeDependency"
-        );
+                // columnas usadas
+                if(
+                    dependencies.includes(col)
+                ){
 
-    }
+                    className +=
+                        " activeDependency";
 
-    // resultado actual
-    if(index === currentColumn){
+                }
 
-        classes.push(
-            "activeCurrent"
-        );
+                // resultado actual
+                if(
+                    index === currentColumn
+                ){
 
-    }
+                    className +=
+                        " activeCurrent";
 
-}
+                }
+
+            }
+
             let value = row[col];
 
             let text = "?";
@@ -853,7 +850,7 @@ if(
             }
 
             html += `
-            <td class="${classes.join(" ")}">
+            <td class="${className}">
                 ${text}
             </td>
             `;
@@ -873,7 +870,6 @@ if(
     ).innerHTML = html;
 
 }
-
 // =========================
 // MOSTRAR PREGUNTA
 // =========================
