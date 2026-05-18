@@ -148,7 +148,10 @@ function extractSubformulas(expr){
 
         expression = expression.trim();
 
-        // quitar paréntesis externos
+        // =========================
+        // QUITAR PARÉNTESIS EXTERNOS
+        // =========================
+
         if(
             expression.startsWith("(") &&
             expression.endsWith(")")
@@ -158,7 +161,7 @@ function extractSubformulas(expr){
             let valid = true;
 
             for(let i=0; i<expression.length-1; i++){
-           
+
                 if(expression[i] === "(") balance++;
                 if(expression[i] === ")") balance--;
 
@@ -174,17 +177,26 @@ function extractSubformulas(expr){
             if(valid){
 
                 expression =
-                    expression.slice(1,-1);
+                    expression.slice(1,-1).trim();
 
             }
 
         }
 
-        // NEGACIÓN
-        if(expression.startsWith("¬")){
+        // =========================
+        // NEGACIÓN SIMPLE
+        // =========================
+
+        if(
+            expression.startsWith("¬") &&
+            !expression.includes("∧") &&
+            !expression.includes("∨") &&
+            !expression.includes("→") &&
+            !expression.includes("↔")
+        ){
 
             let inner =
-                expression.slice(1);
+                expression.slice(1).trim();
 
             recursiveExtract(inner);
 
@@ -196,7 +208,10 @@ function extractSubformulas(expr){
 
         }
 
-        // operadores
+        // =========================
+        // OPERADORES BINARIOS
+        // =========================
+
         let operators =
             ["↔","→","∨","∧"];
 
@@ -204,10 +219,15 @@ function extractSubformulas(expr){
 
             let balance = 0;
 
-            for(let i=expression.length-1; i>=0; i--){
-            
-                if(expression[i] === "(") balance++;
-                if(expression[i] === ")") balance--;
+            // derecha → izquierda
+            for(
+                let i=expression.length-1;
+                i>=0;
+                i--
+            ){
+
+                if(expression[i] === ")") balance++;
+                if(expression[i] === "(") balance--;
 
                 if(
                     balance === 0 &&
@@ -215,17 +235,44 @@ function extractSubformulas(expr){
                 ){
 
                     let left =
-                        expression.slice(0,i);
+                        expression
+                        .slice(0,i)
+                        .trim();
 
                     let right =
-                        expression.slice(i+1);
+                        expression
+                        .slice(i+1)
+                        .trim();
 
+                    // resolver partes
                     recursiveExtract(left);
                     recursiveExtract(right);
 
-                  subformulas.push(
-    "(" + left + op + right + ")"
-);
+                    // agregar negaciones internas
+                    if(
+                        left.startsWith("¬")
+                    ){
+
+                        subformulas.push(left);
+
+                    }
+
+                    if(
+                        right.startsWith("¬")
+                    ){
+
+                        subformulas.push(right);
+
+                    }
+
+                    // agregar fórmula completa
+                    subformulas.push(
+                        "(" +
+                        left +
+                        op +
+                        right +
+                        ")"
+                    );
 
                     return;
 
@@ -242,8 +289,6 @@ function extractSubformulas(expr){
     return [...new Set(subformulas)];
 
 }
-
-
 
 // =========================
 // RESOLVER FÓRMULA
