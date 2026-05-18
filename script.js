@@ -401,20 +401,7 @@ function solveSubformula(expr, values){
     }
 
     // =========================
-    // NEGACIÓN
-    // =========================
-
-    if(expr.startsWith("¬")){
-
-        return !solveSubformula(
-            expr.slice(1),
-            values
-        );
-
-    }
-
-    // =========================
-    // OPERADORES
+    // OPERADORES PRINCIPALES
     // =========================
 
     let operators =
@@ -424,7 +411,9 @@ function solveSubformula(expr, values){
 
         let balance = 0;
 
-        // recorrer derecha → izquierda
+        // derecha → izquierda
+        // para asociatividad correcta
+
         for(
             let i=expr.length-1;
             i>=0;
@@ -480,13 +469,28 @@ function solveSubformula(expr, values){
     }
 
     // =========================
-    // VARIABLE SIMPLE
+    // NEGACIÓN SIMPLE
+    // =========================
+
+    if(expr.startsWith("¬")){
+
+        let inner =
+            expr.slice(1).trim();
+
+        return !solveSubformula(
+            inner,
+            values
+        );
+
+    }
+
+    // =========================
+    // VARIABLE
     // =========================
 
     return values[expr];
 
 }
-
 // =========================
 // VALIDAR FÓRMULA
 // =========================
