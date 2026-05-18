@@ -223,9 +223,9 @@ function extractSubformulas(expr){
                     recursiveExtract(left);
                     recursiveExtract(right);
 
-                    subformulas.push(
-                        left + op + right
-                    );
+                  subformulas.push(
+    "(" + left + op + right + ")"
+);
 
                     return;
 
