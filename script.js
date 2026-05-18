@@ -305,7 +305,7 @@ function solveSubformula(expr, values){
 
         let balance = 0;
 
-        for(let i=expr.length-1; i>=0; i--){
+        for(let i=0; i<expr.length; i++){
        
             if(expr[i] === "(") balance++;
             if(expr[i] === ")") balance--;
