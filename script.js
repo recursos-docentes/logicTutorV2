@@ -369,7 +369,7 @@ function isValidFormula(expr){
 
     // caracteres permitidos
     const validChars =
-        /^[p-q-r-s∧∨¬→↔()]+$/;
+     /^[pqrs∧∨¬→↔()]+$/i;
 
     if(!validChars.test(expr)){
 
@@ -399,6 +399,59 @@ function isValidFormula(expr){
     // operadores repetidos
     if(
         /[∧∨→↔]{2,}/.test(expr)
+    ){
+
+        return false;
+
+    }
+        // variable seguida de negación
+    if(
+       /[a-z]¬/i.test(expr)
+    ){
+
+        return false;
+
+    }
+
+    // variable seguida de (
+    if(
+        /[a-z]\(/i.test(expr)
+    ){
+
+        return false;
+
+    }
+
+    // ) seguida de variable
+    if(
+        /\)[a-z]/i.test(expr)
+    ){
+
+        return false;
+
+    }
+
+    // ) seguida de ¬
+    if(
+        /\)¬/.test(expr)
+    ){
+
+        return false;
+
+    }
+
+    // operador seguido de )
+    if(
+        /[∧∨→↔]\)/.test(expr)
+    ){
+
+        return false;
+
+    }
+
+    // ( seguido de operador binario
+    if(
+        /\([∧∨→↔]/.test(expr)
     ){
 
         return false;
