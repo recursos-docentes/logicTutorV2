@@ -740,32 +740,36 @@ function renderGuidedTable(){
 
 
 
+    // =========================
     // CABECERAS
+    // =========================
 
     guidedTable.columns.forEach((col,index)=>{
 
-        let className = "";
+        let classes = [];
 
         // columnas necesarias
         if(
             dependencies.includes(col)
         ){
 
-            className =
-                "dependencyColumn";
+            classes.push(
+                "dependencyColumn"
+            );
 
         }
 
         // columna actual
         if(index === currentColumn){
 
-            className =
-                "currentColumn";
+            classes.push(
+                "currentColumn"
+            );
 
         }
 
         html += `
-        <th class="${className}">
+        <th class="${classes.join(" ")}">
             ${col}
         </th>
         `;
@@ -776,7 +780,9 @@ function renderGuidedTable(){
 
 
 
+    // =========================
     // FILAS
+    // =========================
 
     guidedTable.rows.forEach((row,rowIndex)=>{
 
@@ -784,23 +790,25 @@ function renderGuidedTable(){
 
         guidedTable.columns.forEach((col,index)=>{
 
-            let className = "";
+            let classes = [];
 
             // dependencias
             if(
                 dependencies.includes(col)
             ){
 
-                className =
-                    "dependencyColumn";
+                classes.push(
+                    "dependencyColumn"
+                );
 
             }
 
             // columna actual
             if(index === currentColumn){
 
-                className =
-                    "currentColumn";
+                classes.push(
+                    "currentColumn"
+                );
 
             }
 
@@ -813,8 +821,9 @@ function renderGuidedTable(){
                 guidedTable.columns.length
             ){
 
-                className +=
-                    " activeRow";
+                classes.push(
+                    "activeRow"
+                );
 
             }
 
@@ -830,7 +839,7 @@ function renderGuidedTable(){
             }
 
             html += `
-            <td class="${className}">
+            <td class="${classes.join(" ")}">
                 ${text}
             </td>
             `;
@@ -850,8 +859,6 @@ function renderGuidedTable(){
     ).innerHTML = html;
 
 }
-
-
 
 // =========================
 // MOSTRAR PREGUNTA
