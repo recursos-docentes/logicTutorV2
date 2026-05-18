@@ -42,149 +42,167 @@
 
         <!-- ENTRADA -->
 
-       <textarea
-    id="formula"
-    spellcheck="false"
-    readonly
-    placeholder="Ejemplo: ((p∨q)→¬r)">
-</textarea>
+        <textarea
+            id="formula"
+            spellcheck="false"
+            readonly
+            placeholder="Ejemplo: ((p∨q)→¬r)">
+        </textarea>
 
 
 
-        <!-- BOTONES DE SÍMBOLOS -->
+        <!-- BOTONES -->
 
-    <!-- VARIABLES -->
+        <div class="symbols">
 
-    <button
-        type="button"
-        class="symbolBtn variableBtn"
-        onclick="insertSymbol('p'); return false;">
+            <!-- VARIABLES -->
 
-        p
+            <button
+                type="button"
+                class="symbolBtn variableBtn"
+                onclick="insertSymbol('p'); return false;">
 
-    </button>
+                p
 
-    <button
-        type="button"
-        class="symbolBtn variableBtn"
-        onclick="insertSymbol('q'); return false;">
+            </button>
 
-        q
+            <button
+                type="button"
+                class="symbolBtn variableBtn"
+                onclick="insertSymbol('q'); return false;">
 
-    </button>
+                q
 
-    <button
-        type="button"
-        class="symbolBtn variableBtn"
-        onclick="insertSymbol('r'); return false;">
+            </button>
 
-        r
+            <button
+                type="button"
+                class="symbolBtn variableBtn"
+                onclick="insertSymbol('r'); return false;">
 
-    </button>
+                r
 
-    <button
-        type="button"
-        class="symbolBtn variableBtn"
-        onclick="insertSymbol('s'); return false;">
+            </button>
 
-        s
+            <button
+                type="button"
+                class="symbolBtn variableBtn"
+                onclick="insertSymbol('s'); return false;">
 
-    </button>
+                s
 
-
-
-    <!-- CONECTORES -->
-
-    <button
-        type="button"
-        class="symbolBtn connectorBtn"
-        onclick="insertSymbol('∧'); return false;">
-
-        ∧
-
-    </button>
-
-    <button
-        type="button"
-        class="symbolBtn connectorBtn"
-        onclick="insertSymbol('∨'); return false;">
-
-        ∨
-
-    </button>
-
-    <button
-        type="button"
-        class="symbolBtn connectorBtn"
-        onclick="insertSymbol('¬'); return false;">
-
-        ¬
-
-    </button>
-
-    <button
-        type="button"
-        class="symbolBtn connectorBtn"
-        onclick="insertSymbol('→'); return false;">
-
-        →
-
-    </button>
-
-    <button
-        type="button"
-        class="symbolBtn connectorBtn"
-        onclick="insertSymbol('↔'); return false;">
-
-        ↔
-
-    </button>
-
-    <button
-        type="button"
-        class="symbolBtn connectorBtn"
-        onclick="insertSymbol('('); return false;">
-
-        (
-
-    </button>
-
-    <button
-        type="button"
-        class="symbolBtn connectorBtn"
-        onclick="insertSymbol(')'); return false;">
-
-        )
-
-    </button>
+            </button>
 
 
 
-    <!-- BORRAR -->
+            <!-- CONECTORES -->
 
-    <button
-        type="button"
-        class="symbolBtn deleteBtn"
-        onclick="deleteLastSymbol(); return false;">
+            <button
+                type="button"
+                class="symbolBtn connectorBtn"
+                onclick="insertSymbol('∧'); return false;">
 
-        ⌫
+                ∧
 
-    </button>
+            </button>
+
+            <button
+                type="button"
+                class="symbolBtn connectorBtn"
+                onclick="insertSymbol('∨'); return false;">
+
+                ∨
+
+            </button>
+
+            <button
+                type="button"
+                class="symbolBtn connectorBtn"
+                onclick="insertSymbol('¬'); return false;">
+
+                ¬
+
+            </button>
+
+            <button
+                type="button"
+                class="symbolBtn connectorBtn"
+                onclick="insertSymbol('→'); return false;">
+
+                →
+
+            </button>
+
+            <button
+                type="button"
+                class="symbolBtn connectorBtn"
+                onclick="insertSymbol('↔'); return false;">
+
+                ↔
+
+            </button>
+
+            <button
+                type="button"
+                class="symbolBtn connectorBtn"
+                onclick="insertSymbol('('); return false;">
+
+                (
+
+            </button>
+
+            <button
+                type="button"
+                class="symbolBtn connectorBtn"
+                onclick="insertSymbol(')'); return false;">
+
+                )
+
+            </button>
 
 
 
-    <!-- LIMPIAR -->
+            <!-- BORRAR -->
 
-    <button
-        type="button"
-        class="symbolBtn clearBtn"
-        onclick="clearFormula(); return false;">
+            <button
+                type="button"
+                class="symbolBtn deleteBtn"
+                onclick="deleteLastSymbol(); return false;">
 
-        🗑
+                ⌫
 
-    </button>
+            </button>
 
-</div>
+
+
+            <!-- LIMPIAR -->
+
+            <button
+                type="button"
+                class="symbolBtn clearBtn"
+                onclick="clearFormula(); return false;">
+
+                🗑
+
+            </button>
+
+        </div>
+
+
+
+        <!-- ACCIONES -->
+
+        <div class="buttons">
+
+            <button
+                type="button"
+                onclick="startGuidedMode(); return false;">
+
+                🧩 Resolver Conmigo
+
+            </button>
+
+        </div>
 
 
 
