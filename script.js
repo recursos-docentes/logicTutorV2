@@ -395,6 +395,14 @@ function isValidFormula(expr){
         return false;
 
     }
+    // variable seguida de variable o negación
+if(
+    /[a-z](?:[a-z]|¬|\()/i.test(expr)
+){
+
+    return false;
+
+}
 
     // operadores repetidos
     if(
