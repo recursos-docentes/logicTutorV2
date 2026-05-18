@@ -71,7 +71,7 @@ function getDirectDependencies(expr){
         let valid = true;
 
         for(let i=0; i<expr.length-1; i++){
-
+            
             if(expr[i] === "(") balance++;
             if(expr[i] === ")") balance--;
 
@@ -105,7 +105,8 @@ function getDirectDependencies(expr){
 
         let balance = 0;
 
-        for(let i=0; i<expr.length; i++){
+       for(let i=expr.length-1; i>=0; i--){
+        
 
             if(expr[i] === "(") balance++;
             if(expr[i] === ")") balance--;
