@@ -813,20 +813,34 @@ function renderGuidedTable(){
             }
 
             // fila activa
-            if(
-                rowIndex ===
-                currentRowInColumn
-                &&
-                currentColumn <
-                guidedTable.columns.length
-            ){
+           // iluminar SOLO celdas usadas
+if(
+    rowIndex === currentRowInColumn &&
+    currentColumn <
+    guidedTable.columns.length
+){
 
-                classes.push(
-                    "activeRow"
-                );
+    // dependencias usadas
+    if(
+        dependencies.includes(col)
+    ){
 
-            }
+        classes.push(
+            "activeDependency"
+        );
 
+    }
+
+    // resultado actual
+    if(index === currentColumn){
+
+        classes.push(
+            "activeCurrent"
+        );
+
+    }
+
+}
             let value = row[col];
 
             let text = "?";
