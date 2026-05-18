@@ -771,19 +771,28 @@ function checkColumnAnswer(answer){
             "feedback"
         );
 
+    // RESPUESTA CORRECTA
     if(answer === currentAnswer){
 
+        // limpiar feedback
         feedback.innerHTML = "";
 
+        // fórmula actual
         let formula =
             guidedTable.columns[currentColumn];
 
+        // guardar resultado en la fila actual
         guidedTable.rows[currentRowInColumn][formula]
             = answer;
 
+        // REDIBUJAR inmediatamente
+        // para que aparezca el último valor
+        renderGuidedTable();
+
+        // avanzar fila
         currentRowInColumn++;
 
-        // terminó columna
+        // terminó la columna
         if(
             currentRowInColumn >=
             guidedTable.rows.length
@@ -795,14 +804,24 @@ function checkColumnAnswer(answer){
 
         }
 
-        // terminó tabla
+        // TERMINÓ TODA LA TABLA
         if(
             currentColumn >=
             guidedTable.columns.length
         ){
 
+            // redibujar tabla final completa
             renderGuidedTable();
 
+            // limpiar progreso
+            document.getElementById(
+                "progress"
+            ).innerHTML = "";
+
+            // limpiar feedback
+            feedback.innerHTML = "";
+
+            // mensaje final
             document.getElementById(
                 "questionArea"
             ).innerHTML = `
@@ -817,11 +836,16 @@ function checkColumnAnswer(answer){
 
         }
 
+        // redibujar nueva columna/fila activa
         renderGuidedTable();
 
+        // siguiente pregunta
         showColumnQuestion();
 
-    }else{
+    }
+
+    // RESPUESTA INCORRECTA
+    else{
 
         feedback.innerHTML = `
 
