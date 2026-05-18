@@ -532,13 +532,29 @@ function startGuidedMode(){
 
 function renderGuidedTable(){
 
-    let currentFormula =
-        guidedTable.columns[currentColumn];
+    let currentFormula = "";
 
-    let dependencies =
-        getDirectDependencies(
-            currentFormula
-        );
+    // evitar error al terminar
+    if(
+        currentColumn <
+        guidedTable.columns.length
+    ){
+
+        currentFormula =
+            guidedTable.columns[currentColumn];
+
+    }
+
+    let dependencies = [];
+
+    if(currentFormula !== ""){
+
+        dependencies =
+            getDirectDependencies(
+                currentFormula
+            );
+
+    }
 
     let html = "<table><tr>";
 
@@ -550,6 +566,7 @@ function renderGuidedTable(){
 
         let className = "";
 
+        // columnas necesarias
         if(
             dependencies.includes(col)
         ){
@@ -559,6 +576,7 @@ function renderGuidedTable(){
 
         }
 
+        // columna actual
         if(index === currentColumn){
 
             className =
@@ -588,6 +606,7 @@ function renderGuidedTable(){
 
             let className = "";
 
+            // dependencias
             if(
                 dependencies.includes(col)
             ){
@@ -597,6 +616,7 @@ function renderGuidedTable(){
 
             }
 
+            // columna actual
             if(index === currentColumn){
 
                 className =
@@ -604,10 +624,13 @@ function renderGuidedTable(){
 
             }
 
-            // fila actual
+            // fila activa
             if(
                 rowIndex ===
                 currentRowInColumn
+                &&
+                currentColumn <
+                guidedTable.columns.length
             ){
 
                 className +=
@@ -639,6 +662,8 @@ function renderGuidedTable(){
     });
 
     html += "</table>";
+
+
 
     document.getElementById(
         "tableContainer"
