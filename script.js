@@ -833,5 +833,12 @@ function checkColumnAnswer(answer){
 
     }
 
-console.log("Logic Tutor cargado correctamente");
-     }
+}
+
+
+
+// DEBUG
+
+console.log(
+    "Logic Tutor cargado correctamente"
+);
