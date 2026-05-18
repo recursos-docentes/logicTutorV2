@@ -319,7 +319,44 @@ td{
     text-align:center;
 }
 
+   /* CENTRAR TODOS LOS BOTONES */
+.symbols{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:12px;
+    margin-top:20px;
+}
 
+/* ESTILO GENERAL */
+.symbolBtn{
+    min-width:65px;
+    height:60px;
+    border:none;
+    border-radius:14px;
+    font-size:26px;
+    font-weight:bold;
+    color:white;
+    cursor:pointer;
+    transition:0.2s;
+}
+
+/* HOVER */
+.symbolBtn:hover{
+    transform:translateY(-2px);
+    opacity:0.9;
+}
+
+/* VARIABLES */
+.variableBtn{
+    background:#4f8cff;
+}
+
+/* CONECTORES */
+.connectorBtn{
+    background:#9b59ff;
+}
 
 /* RESPONSIVE */
 
@@ -356,6 +393,5 @@ td{
     .answerButtons{
         flex-direction:column;
     }
-
   
 }
