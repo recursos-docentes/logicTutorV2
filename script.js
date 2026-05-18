@@ -61,7 +61,10 @@ function getDirectDependencies(expr){
 
     expr = expr.trim();
 
-    // quitar paréntesis externos
+    // =========================
+    // QUITAR PARÉNTESIS EXTERNOS
+    // =========================
+
     if(
         expr.startsWith("(") &&
         expr.endsWith(")")
@@ -71,7 +74,7 @@ function getDirectDependencies(expr){
         let valid = true;
 
         for(let i=0; i<expr.length-1; i++){
-            
+
             if(expr[i] === "(") balance++;
             if(expr[i] === ")") balance--;
 
@@ -86,30 +89,54 @@ function getDirectDependencies(expr){
 
         if(valid){
 
-            expr = expr.slice(1,-1);
+            expr =
+                expr.slice(1,-1).trim();
 
         }
 
     }
 
-    // NEGACIÓN
-    if(expr.startsWith("¬")){
+    // =========================
+    // NEGACIÓN SIMPLE
+    // =========================
 
-        return [expr.slice(1)];
+    if(
+        expr.startsWith("¬") &&
+        !expr.includes("∧") &&
+        !expr.includes("∨") &&
+        !expr.includes("→") &&
+        !expr.includes("↔")
+    ){
+
+        let inner =
+            expr.slice(1).trim();
+
+        return [inner];
 
     }
 
-    let operators = ["↔","→","∨","∧"];
+    // =========================
+    // OPERADORES
+    // =========================
+
+    let operators =
+        ["↔","→","∨","∧"];
 
     for(let op of operators){
 
         let balance = 0;
 
-       for(let i=expr.length-1; i>=0; i--){
-        
+        // derecha → izquierda
+        // para asociatividad correcta
 
-            if(expr[i] === "(") balance++;
-            if(expr[i] === ")") balance--;
+        for(
+            let i=expr.length-1;
+            i>=0;
+            i--
+        ){
+
+            if(expr[i] === ")") balance++;
+            if(expr[i] === "(") balance--;
 
             if(
                 balance === 0 &&
@@ -122,6 +149,49 @@ function getDirectDependencies(expr){
                 let right =
                     expr.slice(i+1).trim();
 
+                // =========================
+                // SI HAY NEGACIÓN
+                // usar la subfórmula completa
+                // =========================
+
+                if(
+                    left.startsWith("¬")
+                ){
+
+                    left = left;
+
+                }
+                else if(
+                    left.includes("∧") ||
+                    left.includes("∨") ||
+                    left.includes("→") ||
+                    left.includes("↔")
+                ){
+
+                    left =
+                        "(" + left + ")";
+
+                }
+
+                if(
+                    right.startsWith("¬")
+                ){
+
+                    right = right;
+
+                }
+                else if(
+                    right.includes("∧") ||
+                    right.includes("∨") ||
+                    right.includes("→") ||
+                    right.includes("↔")
+                ){
+
+                    right =
+                        "(" + right + ")";
+
+                }
+
                 return [left,right];
 
             }
@@ -133,9 +203,6 @@ function getDirectDependencies(expr){
     return [expr];
 
 }
-
-
-
 // =========================
 // EXTRAER SUBFÓRMULAS
 // =========================
