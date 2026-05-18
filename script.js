@@ -1084,6 +1084,26 @@ function checkColumnAnswer(answer){
 
 }
 
+function deleteLastSymbol(){
+
+    const textarea =
+        document.getElementById("formula");
+
+    textarea.value =
+        textarea.value.slice(0,-1);
+
+}
+
+
+
+function clearFormula(){
+
+    document.getElementById(
+        "formula"
+    ).value = "";
+
+}
+
 
 
 // DEBUG
