@@ -949,6 +949,9 @@ function checkColumnAnswer(answer){
             </div>
 
             `;
+            document.getElementById(
+    "formula"
+).value = "";
 
             return;
 
