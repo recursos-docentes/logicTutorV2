@@ -253,20 +253,10 @@ function solveSubformula(expr, values){
 
     expr = expr.trim();
 
-    // NEGACIÓN
-    if(expr.startsWith("¬")){
+    // =========================
+    // QUITAR PARÉNTESIS EXTERNOS
+    // =========================
 
-        let inner =
-            expr.slice(1);
-
-        return !solveSubformula(
-            inner,
-            values
-        );
-
-    }
-
-    // quitar paréntesis externos
     if(
         expr.startsWith("(") &&
         expr.endsWith(")")
@@ -276,7 +266,6 @@ function solveSubformula(expr, values){
         let valid = true;
 
         for(let i=0; i<expr.length-1; i++){
-            
 
             if(expr[i] === "(") balance++;
             if(expr[i] === ")") balance--;
@@ -292,11 +281,29 @@ function solveSubformula(expr, values){
 
         if(valid){
 
-            expr = expr.slice(1,-1);
+            expr =
+                expr.slice(1,-1).trim();
 
         }
 
     }
+
+    // =========================
+    // NEGACIÓN
+    // =========================
+
+    if(expr.startsWith("¬")){
+
+        return !solveSubformula(
+            expr.slice(1),
+            values
+        );
+
+    }
+
+    // =========================
+    // OPERADORES
+    // =========================
 
     let operators =
         ["↔","→","∨","∧"];
@@ -305,10 +312,15 @@ function solveSubformula(expr, values){
 
         let balance = 0;
 
-        for(let i=0; i<expr.length; i++){
-       
-            if(expr[i] === "(") balance++;
-            if(expr[i] === ")") balance--;
+        // recorrer derecha → izquierda
+        for(
+            let i=expr.length-1;
+            i>=0;
+            i--
+        ){
+
+            if(expr[i] === ")") balance++;
+            if(expr[i] === "(") balance--;
 
             if(
                 balance === 0 &&
@@ -316,10 +328,10 @@ function solveSubformula(expr, values){
             ){
 
                 let left =
-                    expr.slice(0,i);
+                    expr.slice(0,i).trim();
 
                 let right =
-                    expr.slice(i+1);
+                    expr.slice(i+1).trim();
 
                 let A =
                     solveSubformula(
@@ -354,6 +366,10 @@ function solveSubformula(expr, values){
         }
 
     }
+
+    // =========================
+    // VARIABLE SIMPLE
+    // =========================
 
     return values[expr];
 
