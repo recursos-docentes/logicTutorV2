@@ -359,6 +359,77 @@ function solveSubformula(expr, values){
 
 }
 
+// =========================
+// VALIDAR FÓRMULA
+// =========================
+
+function isValidFormula(expr){
+
+    expr = expr.replace(/\s/g,"");
+
+    // caracteres permitidos
+    const validChars =
+        /^[p-q-r-s∧∨¬→↔()]+$/;
+
+    if(!validChars.test(expr)){
+
+        return false;
+
+    }
+
+    // no puede terminar u empezar mal
+    if(
+        /^[∧∨→↔]/.test(expr) ||
+        /[∧∨¬→↔]$/.test(expr)
+    ){
+
+        return false;
+
+    }
+
+    // variables pegadas
+    if(
+        /[a-z][a-z]/i.test(expr)
+    ){
+
+        return false;
+
+    }
+
+    // operadores repetidos
+    if(
+        /[∧∨→↔]{2,}/.test(expr)
+    ){
+
+        return false;
+
+    }
+
+    // paréntesis balanceados
+    let balance = 0;
+
+    for(let char of expr){
+
+        if(char === "(") balance++;
+        if(char === ")") balance--;
+
+        if(balance < 0){
+
+            return false;
+
+        }
+
+    }
+
+    if(balance !== 0){
+
+        return false;
+
+    }
+
+    return true;
+
+}
 
 
 // =========================
@@ -372,7 +443,17 @@ function generateTruthTable(){
         .value
         .trim();
 
-    if(formula === "") return;
+   if(formula === "") return;
+
+if(!isValidFormula(formula)){
+
+    alert(
+        "La fórmula lógica no es válida"
+    );
+
+    return;
+
+}
 
     const vars =
         getVariables(formula);
@@ -473,6 +554,16 @@ function startGuidedMode(){
         .trim();
 
     if(formula === "") return;
+
+if(!isValidFormula(formula)){
+
+    alert(
+        "La fórmula lógica no es válida"
+    );
+
+    return;
+
+}
 
     const vars =
         getVariables(formula);
