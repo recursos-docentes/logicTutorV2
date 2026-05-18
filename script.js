@@ -401,7 +401,7 @@ function solveSubformula(expr, values){
     }
 
     // =========================
-    // OPERADORES PRINCIPALES
+    // BUSCAR OPERADOR PRINCIPAL
     // =========================
 
     let operators =
@@ -412,7 +412,7 @@ function solveSubformula(expr, values){
         let balance = 0;
 
         // derecha → izquierda
-        // para asociatividad correcta
+        // asociatividad correcta
 
         for(
             let i=expr.length-1;
@@ -422,6 +422,9 @@ function solveSubformula(expr, values){
 
             if(expr[i] === ")") balance++;
             if(expr[i] === "(") balance--;
+
+            // ignorar negación
+            if(i === 0) continue;
 
             if(
                 balance === 0 &&
