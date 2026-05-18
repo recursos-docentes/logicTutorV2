@@ -358,6 +358,26 @@ td{
     background:#9b59ff;
 }
 
+/* FILA ACTIVA */
+
+.activeRow{
+    background:#fff6bf !important;
+}
+
+/* fila activa + dependencias */
+
+td.activeRow.dependencyColumn,
+th.activeRow.dependencyColumn{
+    background:#ffe58f !important;
+}
+
+/* fila activa + columna actual */
+
+td.activeRow.currentColumn,
+th.activeRow.currentColumn{
+    background:#ffcccc !important;
+}
+
 /* RESPONSIVE */
 
 @media(max-width:700px){
