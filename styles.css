@@ -394,6 +394,22 @@ th.activeRow.currentColumn{
         inset 0 0 0 3px #ff6b6b;
 }
 
+.deleteBtn{
+    background:#ff9f43;
+}
+
+.deleteBtn:hover{
+    background:#ff7f00;
+}
+
+.clearBtn{
+    background:#ff5c5c;
+}
+
+.clearBtn:hover{
+    background:#e63939;
+}
+
 /*======================*/
 /* RESPONSIVE */
 /*======================*/
