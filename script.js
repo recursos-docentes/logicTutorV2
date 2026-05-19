@@ -587,7 +587,10 @@ function isValidFormula(expr){
     // caracteres permitidos
     const validChars =
      /^[pqrs∧∨¬→↔()]+$/i;
-
+   // Si la cadena está vacía o contiene paréntesis vacíos, rechazar
+    if(expr === "" || /\(\s*\)/.test(expr)) {
+        return false;
+    }
     if(!validChars.test(expr)){
 
         return false;
