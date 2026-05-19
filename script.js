@@ -19,6 +19,8 @@ function insertSymbol(symbol){
 
 }
 
+
+
 // =========================
 // VARIABLES
 // =========================
