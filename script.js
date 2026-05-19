@@ -227,10 +227,22 @@ function getDirectDependencies(expr){
             if(expr[i] === ")") balance++;
             if(expr[i] === "(") balance--;
 
-            if(
-                balance === 0 &&
-                expr[i] === op
-            ){
+          if(
+    balance === 0 &&
+    expr[i] === op
+){
+
+    // evitar tomar operador
+    // dentro de una negación
+
+    if(
+        i > 0 &&
+        expr[i-1] === "¬"
+    ){
+
+        continue;
+
+    }{
 
                 let left =
                     normalizeFormula(
@@ -348,10 +360,22 @@ function extractSubformulas(expr){
                 if(expression[i] === ")") balance++;
                 if(expression[i] === "(") balance--;
 
-                if(
-                    balance === 0 &&
-                    expression[i] === op
-                ){
+               if(
+    balance === 0 &&
+    expr[i] === op
+){
+
+    // evitar tomar operador
+    // dentro de una negación
+
+    if(
+        i > 0 &&
+        expr[i-1] === "¬"
+    ){
+
+        continue;
+
+    }{
 
                     let left =
                         expression
@@ -478,10 +502,22 @@ function solveSubformula(expr, values){
             if(expr[i] === ")") balance++;
             if(expr[i] === "(") balance--;
 
-            if(
-                balance === 0 &&
-                expr[i] === op
-            ){
+           if(
+    balance === 0 &&
+    expr[i] === op
+){
+
+    // evitar tomar operador
+    // dentro de una negación
+
+    if(
+        i > 0 &&
+        expr[i-1] === "¬"
+    ){
+
+        continue;
+
+    }{
 
                 let left =
                     expr.slice(0,i).trim();
