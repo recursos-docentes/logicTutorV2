@@ -341,11 +341,8 @@ function solveSubformula(expr, values){
 
     expr = expr.trim();
 
-    // =========================
-    // QUITAR PARÉNTESIS EXTERNOS
-    // =========================
-
-    if(
+    // quitar paréntesis externos SOLO si envuelven todo
+    while(
         expr.startsWith("(") &&
         expr.endsWith(")")
     ){
@@ -369,17 +366,37 @@ function solveSubformula(expr, values){
 
         if(valid){
 
-            expr =
-                expr.slice(1,-1).trim();
+            expr = expr.slice(1,-1).trim();
+
+        }else{
+
+            break;
 
         }
 
     }
 
-    // =========================
-    // BUSCAR OPERADOR PRINCIPAL
-    // =========================
+    // VARIABLE
+    if(/^[a-z]$/i.test(expr)){
 
+        return values[expr];
+
+    }
+
+    // NEGACIÓN
+    if(expr.startsWith("¬")){
+
+        let inner =
+            expr.slice(1).trim();
+
+        return !solveSubformula(
+            inner,
+            values
+        );
+
+    }
+
+    // operadores por precedencia
     let operators =
         ["↔","→","∨","∧"];
 
@@ -387,9 +404,7 @@ function solveSubformula(expr, values){
 
         let balance = 0;
 
-        // derecha → izquierda
-        // asociatividad correcta
-
+        // derecha a izquierda
         for(
             let i=expr.length-1;
             i>=0;
@@ -398,9 +413,6 @@ function solveSubformula(expr, values){
 
             if(expr[i] === ")") balance++;
             if(expr[i] === "(") balance--;
-
-            // ignorar negación
-            if(i === 0) continue;
 
             if(
                 balance === 0 &&
@@ -447,29 +459,10 @@ function solveSubformula(expr, values){
 
     }
 
-    // =========================
-    // NEGACIÓN SIMPLE
-    // =========================
-
-    if(expr.startsWith("¬")){
-
-        let inner =
-            expr.slice(1).trim();
-
-        return !solveSubformula(
-            inner,
-            values
-        );
-
-    }
-
-    // =========================
-    // VARIABLE
-    // =========================
-
-    return values[expr];
+    return false;
 
 }
+
 // =========================
 // VALIDAR FÓRMULA
 // =========================
