@@ -15,24 +15,10 @@ function insertSymbol(symbol){
     const textarea =
         document.getElementById("formula");
 
-    textarea.focus();
-
-    const start =
-        textarea.selectionStart ?? textarea.value.length;
-
-    const end =
-        textarea.selectionEnd ?? textarea.value.length;
-
-    textarea.value =
-        textarea.value.substring(0,start)
-        + symbol +
-        textarea.value.substring(end);
-
-    textarea.selectionStart =
-        textarea.selectionEnd =
-        start + symbol.length;
+    textarea.value += symbol;
 
 }
+
 // =========================
 // VARIABLES
 // =========================
