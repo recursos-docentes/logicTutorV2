@@ -987,110 +987,47 @@ function showColumnQuestion(){
             formula
         );
 
-   document.getElementById(
-    "progress"
-).innerHTML = `
-
-    Resolviendo columna:
-    <b>${formula}</b>
-
-    <br>
-
-    Fila
-    ${currentRowInColumn + 1}
-    de
-    ${guidedTable.rows.length}
-
-    <br><br>
-
-    ❌ Errores:
-    <b>${mistakes}</b>
-
-`;
-
-    Resolviendo columna:
-    <b>${formula}</b>
-
-    <br>
-
-    Fila
-    ${currentRowInColumn + 1}
-    de
-    ${guidedTable.rows.length}
-
+    document.getElementById(
+        "progress"
+    ).innerHTML = `
+        Resolviendo columna:
+        <b>${formula}</b>
+        <br>
+        Fila ${currentRowInColumn + 1} de ${guidedTable.rows.length}
+        <br><br>
+        ❌ Errores:
+        <b>${mistakes}</b>
     `;
-
-
 
     document.getElementById(
         "questionArea"
     ).innerHTML = `
+        <div class="question">
+            <h3>${formula}</h3>
+            <div class="variablesRow">
+                ${dependencies.map(dep=>`
+                    <div class="variableBox">
+                        <span class="variableName">
+                            ${dep}
+                        </span>
+                        <span class="variableValue ${row[dep] ? 'valueTrue' : 'valueFalse'}">
+                            ${row[dep] ? 'V' : 'F'}
+                        </span>
+                    </div>
+                `).join("")}
+            </div>
 
-    <div class="question">
-
-        <h3>${formula}</h3>
-
-        <div class="variablesRow">
-
-            ${dependencies.map(dep=>`
-
-                <div class="variableBox">
-
-                    <span class="variableName">
-                        ${dep}
-                    </span>
-
-                    <span class="
-                        variableValue
-                        ${
-                            row[dep]
-                            ? 'valueTrue'
-                            : 'valueFalse'
-                        }
-                    ">
-
-                        ${
-                            row[dep]
-                            ? 'V'
-                            : 'F'
-                        }
-
-                    </span>
-
-                </div>
-
-            `).join("")}
-
+            <div class="answerButtons">
+                <button type="button" onclick="checkColumnAnswer(true); return false;">
+                    🟩 Verdadero
+                </button>
+                <button type="button" onclick="checkColumnAnswer(false); return false;">
+                    🟦 Falso
+                </button>
+            </div>
         </div>
-
-
-
-        <div class="answerButtons">
-
-            <button
-                type="button"
-                onclick="checkColumnAnswer(true); return false;">
-
-                🟩 Verdadero
-
-            </button>
-
-            <button
-                type="button"
-                onclick="checkColumnAnswer(false); return false;">
-
-                🟦 Falso
-
-            </button>
-
-        </div>
-
-    </div>
-
     `;
-
 }
-
 
 
 // =========================
