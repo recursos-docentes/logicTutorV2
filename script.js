@@ -968,48 +968,34 @@ function renderGuidedTable(){
 // MOSTRAR PREGUNTA
 // =========================
 
+// =========================
+// MOSTRAR PREGUNTA
+// =========================
+
 function showColumnQuestion(){
 
-    let formula =
-        guidedTable.columns[currentColumn];
+    let formula = guidedTable.columns[currentColumn];
+    let row = guidedTable.rows[currentRowInColumn];
 
-    let row =
-        guidedTable.rows[currentRowInColumn];
+    currentAnswer = solveSubformula(formula, row);
 
-    currentAnswer =
-        solveSubformula(
-            formula,
-            row
-        );
+    let dependencies = getDirectDependencies(formula);
 
-    let dependencies =
-        getDirectDependencies(
-            formula
-        );
-
-    document.getElementById(
-        "progress"
-    ).innerHTML = `
-        Resolviendo columna:
-        <b>${formula}</b>
-        <br>
-        Fila ${currentRowInColumn + 1} de ${guidedTable.rows.length}
-        <br><br>
-        ❌ Errores:
-        <b>${mistakes}</b>
+    // Actualizar progreso
+    document.getElementById("progress").innerHTML = `
+        Resolviendo columna: <b>${formula}</b><br>
+        Fila ${currentRowInColumn + 1} de ${guidedTable.rows.length}<br><br>
+        ❌ Errores: <b>${mistakes}</b>
     `;
 
-    document.getElementById(
-        "questionArea"
-    ).innerHTML = `
+    // Actualizar área de pregunta
+    document.getElementById("questionArea").innerHTML = `
         <div class="question">
             <h3>${formula}</h3>
             <div class="variablesRow">
                 ${dependencies.map(dep=>`
                     <div class="variableBox">
-                        <span class="variableName">
-                            ${dep}
-                        </span>
+                        <span class="variableName">${dep}</span>
                         <span class="variableValue ${row[dep] ? 'valueTrue' : 'valueFalse'}">
                             ${row[dep] ? 'V' : 'F'}
                         </span>
@@ -1028,8 +1014,6 @@ function showColumnQuestion(){
         </div>
     `;
 }
-
-
 // =========================
 // VALIDAR RESPUESTA
 // =========================
