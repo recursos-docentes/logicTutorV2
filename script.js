@@ -215,11 +215,8 @@ function extractSubformulas(expr){
 
         expression = expression.trim();
 
-        // =========================
-        // QUITAR PARÉNTESIS EXTERNOS
-        // =========================
-
-        if(
+        // quitar paréntesis externos
+        while(
             expression.startsWith("(") &&
             expression.endsWith(")")
         ){
@@ -246,21 +243,23 @@ function extractSubformulas(expr){
                 expression =
                     expression.slice(1,-1).trim();
 
+            }else{
+
+                break;
+
             }
 
         }
 
-        // =========================
-        // NEGACIÓN SIMPLE
-        // =========================
+        // VARIABLE SIMPLE
+        if(/^[a-z]$/i.test(expression)){
 
-        if(
-            expression.startsWith("¬") &&
-            !expression.includes("∧") &&
-            !expression.includes("∨") &&
-            !expression.includes("→") &&
-            !expression.includes("↔")
-        ){
+            return;
+
+        }
+
+        // NEGACIÓN
+        if(expression.startsWith("¬")){
 
             let inner =
                 expression.slice(1).trim();
@@ -275,10 +274,7 @@ function extractSubformulas(expr){
 
         }
 
-        // =========================
-        // OPERADORES BINARIOS
-        // =========================
-
+        // operadores por precedencia
         let operators =
             ["↔","→","∨","∧"];
 
@@ -286,7 +282,6 @@ function extractSubformulas(expr){
 
             let balance = 0;
 
-            // derecha → izquierda
             for(
                 let i=expression.length-1;
                 i>=0;
@@ -311,28 +306,9 @@ function extractSubformulas(expr){
                         .slice(i+1)
                         .trim();
 
-                    // resolver partes
                     recursiveExtract(left);
                     recursiveExtract(right);
 
-                    // agregar negaciones internas
-                    if(
-                        left.startsWith("¬")
-                    ){
-
-                        subformulas.push(left);
-
-                    }
-
-                    if(
-                        right.startsWith("¬")
-                    ){
-
-                        subformulas.push(right);
-
-                    }
-
-                    // agregar fórmula completa
                     subformulas.push(
                         "(" +
                         left +
