@@ -108,10 +108,7 @@ function getDirectDependencies(expr){
 
     expr = expr.trim();
 
-    // =========================
-    // QUITAR PARÉNTESIS EXTERNOS
-    // =========================
-
+    // quitar paréntesis externos
     while(
         expr.startsWith("(") &&
         expr.endsWith(")")
@@ -136,8 +133,7 @@ function getDirectDependencies(expr){
 
         if(valid){
 
-            expr =
-                expr.slice(1,-1).trim();
+            expr = expr.slice(1,-1).trim();
 
         }else{
 
@@ -147,61 +143,47 @@ function getDirectDependencies(expr){
 
     }
 
-    // =========================
     // NEGACIÓN PURA
-    // =========================
+    if(expr.startsWith("¬")){
 
-  if(expr.startsWith("¬")){
+        let balance = 0;
+        let hasMainOperator = false;
 
-    let balance = 0;
-    let hasMainOperator = false;
+        for(let i=1; i<expr.length; i++){
 
-    for(let i=1; i<expr.length; i++){
+            if(expr[i] === "(") balance++;
+            if(expr[i] === ")") balance--;
 
-        if(expr[i] === "(") balance++;
-        if(expr[i] === ")") balance--;
+            if(
+                balance === 0 &&
+                ["∧","∨","→","↔"].includes(expr[i])
+            ){
 
-        if(
-            balance === 0 &&
-            ["∧","∨","→","↔"]
-            .includes(expr[i])
-        ){
+                hasMainOperator = true;
+                break;
 
-            hasMainOperator = true;
-            break;
+            }
+
+        }
+
+        if(!hasMainOperator){
+
+            return [
+                normalizeFormula(
+                    expr.slice(1).trim()
+                )
+            ];
 
         }
 
     }
 
-    // SOLO es negación pura
-    // si NO hay operador principal
-    if(!hasMainOperator){
-
-        let inner =
-            expr.slice(1).trim();
-
-        return [
-            normalizeFormula(inner)
-        ];
-
-    }
-
-}
-
-    // =========================
-    // OPERADORES
-    // =========================
-
-    let operators =
-        ["↔","→","∨","∧"];
+    // OPERADORES PRINCIPALES
+    let operators = ["↔","→","∨","∧"];
 
     for(let op of operators){
 
         let balance = 0;
-
-        // derecha → izquierda
-        // para asociatividad
 
         for(
             let i=expr.length-1;
@@ -212,35 +194,19 @@ function getDirectDependencies(expr){
             if(expr[i] === ")") balance++;
             if(expr[i] === "(") balance--;
 
-          if(
-    balance === 0 &&
-    expr[i] === op
-){
-
-    // evitar tomar operador
-    // dentro de una negación
-
-    if(
-        i > 0 &&
-        expr[i-1] === "¬"
-    ){
-
-        continue;
-
-    }{
+            if(
+                balance === 0 &&
+                expr[i] === op
+            ){
 
                 let left =
                     normalizeFormula(
-                        expr
-                        .slice(0,i)
-                        .trim()
+                        expr.slice(0,i).trim()
                     );
 
                 let right =
                     normalizeFormula(
-                        expr
-                        .slice(i+1)
-                        .trim()
+                        expr.slice(i+1).trim()
                     );
 
                 return [left,right];
@@ -256,7 +222,6 @@ function getDirectDependencies(expr){
     ];
 
 }
-
 // =========================
 // EXTRAER SUBFÓRMULAS
 // =========================
@@ -305,7 +270,7 @@ function extractSubformulas(expr){
 
         }
 
-        // VARIABLE SIMPLE
+        // VARIABLE
         if(/^[a-z]$/i.test(expression)){
 
             return;
@@ -321,14 +286,15 @@ function extractSubformulas(expr){
             recursiveExtract(inner);
 
             subformulas.push(
-                "¬" + inner
+                normalizeFormula(
+                    "¬" + inner
+                )
             );
 
             return;
 
         }
 
-        // operadores por precedencia
         let operators =
             ["↔","→","∨","∧"];
 
@@ -345,22 +311,10 @@ function extractSubformulas(expr){
                 if(expression[i] === ")") balance++;
                 if(expression[i] === "(") balance--;
 
-               if(
-    balance === 0 &&
-    expr[i] === op
-){
-
-    // evitar tomar operador
-    // dentro de una negación
-
-    if(
-        i > 0 &&
-        expr[i-1] === "¬"
-    ){
-
-        continue;
-
-    }{
+                if(
+                    balance === 0 &&
+                    expression[i] === op
+                ){
 
                     let left =
                         expression
@@ -375,20 +329,12 @@ function extractSubformulas(expr){
                     recursiveExtract(left);
                     recursiveExtract(right);
 
-                   let formula =
-    left + op + right;
+                    let formula =
+                        normalizeFormula(
+                            left + op + right
+                        );
 
-// agregar paréntesis SOLO si hace falta
-if(
-    !/^[a-z]$/i.test(formula) &&
-    !formula.startsWith("¬")
-){
-
-    formula = "(" + formula + ")";
-
-}
-
-subformulas.push(formula);
+                    subformulas.push(formula);
 
                     return;
 
@@ -405,7 +351,6 @@ subformulas.push(formula);
     return [...new Set(subformulas)];
 
 }
-
 // =========================
 // RESOLVER FÓRMULA
 // =========================
@@ -414,7 +359,7 @@ function solveSubformula(expr, values){
 
     expr = expr.trim();
 
-    // quitar paréntesis externos SOLO si envuelven todo
+    // quitar paréntesis externos
     while(
         expr.startsWith("(") &&
         expr.endsWith(")")
@@ -459,17 +404,13 @@ function solveSubformula(expr, values){
     // NEGACIÓN
     if(expr.startsWith("¬")){
 
-        let inner =
-            expr.slice(1).trim();
-
         return !solveSubformula(
-            inner,
+            expr.slice(1).trim(),
             values
         );
 
     }
 
-    // operadores por precedencia
     let operators =
         ["↔","→","∨","∧"];
 
@@ -477,7 +418,6 @@ function solveSubformula(expr, values){
 
         let balance = 0;
 
-        // derecha a izquierda
         for(
             let i=expr.length-1;
             i>=0;
@@ -487,22 +427,10 @@ function solveSubformula(expr, values){
             if(expr[i] === ")") balance++;
             if(expr[i] === "(") balance--;
 
-           if(
-    balance === 0 &&
-    expr[i] === op
-){
-
-    // evitar tomar operador
-    // dentro de una negación
-
-    if(
-        i > 0 &&
-        expr[i-1] === "¬"
-    ){
-
-        continue;
-
-    }{
+            if(
+                balance === 0 &&
+                expr[i] === op
+            ){
 
                 let left =
                     expr.slice(0,i).trim();
@@ -511,16 +439,10 @@ function solveSubformula(expr, values){
                     expr.slice(i+1).trim();
 
                 let A =
-                    solveSubformula(
-                        left,
-                        values
-                    );
+                    solveSubformula(left, values);
 
                 let B =
-                    solveSubformula(
-                        right,
-                        values
-                    );
+                    solveSubformula(right, values);
 
                 switch(op){
 
