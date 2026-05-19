@@ -755,9 +755,14 @@ function renderGuidedTable(){
         let className = "";
 
         // columnas necesarias
-        if(
-            dependencies.includes(col)
-        ){
+      if(
+    dependencies.some(
+        dep =>
+            normalizeFormula(dep)
+            ===
+            normalizeFormula(col)
+    )
+){
 
             className +=
                 " dependencyColumn";
@@ -797,9 +802,14 @@ function renderGuidedTable(){
             let className = "";
 
             // dependencias
-            if(
-                dependencies.includes(col)
-            ){
+          if(
+    dependencies.some(
+        dep =>
+            normalizeFormula(dep)
+            ===
+            normalizeFormula(col)
+    )
+){
 
                 className +=
                     " dependencyColumn";
