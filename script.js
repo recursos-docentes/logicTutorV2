@@ -166,7 +166,32 @@ function getDirectDependencies(expr){
     // NEGACIÓN PURA
     // =========================
 
-    if(expr.startsWith("¬")){
+  if(expr.startsWith("¬")){
+
+    let balance = 0;
+    let hasMainOperator = false;
+
+    for(let i=1; i<expr.length; i++){
+
+        if(expr[i] === "(") balance++;
+        if(expr[i] === ")") balance--;
+
+        if(
+            balance === 0 &&
+            ["∧","∨","→","↔"]
+            .includes(expr[i])
+        ){
+
+            hasMainOperator = true;
+            break;
+
+        }
+
+    }
+
+    // SOLO es negación pura
+    // si NO hay operador principal
+    if(!hasMainOperator){
 
         let inner =
             expr.slice(1).trim();
@@ -176,6 +201,8 @@ function getDirectDependencies(expr){
         ];
 
     }
+
+}
 
     // =========================
     // OPERADORES
