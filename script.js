@@ -309,13 +309,20 @@ function extractSubformulas(expr){
                     recursiveExtract(left);
                     recursiveExtract(right);
 
-                    subformulas.push(
-                        "(" +
-                        left +
-                        op +
-                        right +
-                        ")"
-                    );
+                   let formula =
+    left + op + right;
+
+// agregar paréntesis SOLO si hace falta
+if(
+    !/^[a-z]$/i.test(formula) &&
+    !formula.startsWith("¬")
+){
+
+    formula = "(" + formula + ")";
+
+}
+
+subformulas.push(formula);
 
                     return;
 
