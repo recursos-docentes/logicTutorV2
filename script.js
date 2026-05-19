@@ -18,24 +18,21 @@ function insertSymbol(symbol){
     textarea.focus();
 
     const start =
-        textarea.selectionStart;
+        textarea.selectionStart ?? textarea.value.length;
 
     const end =
-        textarea.selectionEnd;
+        textarea.selectionEnd ?? textarea.value.length;
 
     textarea.value =
-        textarea.value.substring(0, start)
+        textarea.value.substring(0,start)
         + symbol +
         textarea.value.substring(end);
 
     textarea.selectionStart =
-    textarea.selectionEnd =
+        textarea.selectionEnd =
         start + symbol.length;
 
 }
-
-
-
 // =========================
 // VARIABLES
 // =========================
