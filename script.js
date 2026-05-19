@@ -316,23 +316,46 @@ function extractSubformulas(expr){
                     expression[i] === op
                 ){
 
-                    let left =
-                        expression
-                        .slice(0,i)
-                        .trim();
+                let left =
+    expression
+    .slice(0,i)
+    .trim();
 
-                    let right =
-                        expression
-                        .slice(i+1)
-                        .trim();
+let right =
+    expression
+    .slice(i+1)
+    .trim();
+
+// preservar negaciones
+if(
+    left.startsWith("¬")
+){
+
+    left =
+        "¬" +
+        left.slice(1).trim();
+
+}
+
+if(
+    right.startsWith("¬")
+){
+
+    right =
+        "¬" +
+        right.slice(1).trim();
+
+}
 
                     recursiveExtract(left);
                     recursiveExtract(right);
 
                     let formula =
-                        normalizeFormula(
-                            left + op + right
-                        );
+    normalizeFormula(
+        left +
+        op +
+        right
+    );
 
                     subformulas.push(formula);
 
