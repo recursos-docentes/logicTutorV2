@@ -3,6 +3,7 @@ let guidedTable = {};
 let currentColumn = 0;
 let currentRowInColumn = 0;
 let currentAnswer = false;
+let mistakes = 0;
 
 
 
@@ -715,6 +716,8 @@ if(
 // =========================
 
 function startGuidedMode(){
+    mistakes = 0;
+    currentRowInColumn = 0;
 
     const formula =
         document.getElementById("formula")
@@ -984,9 +987,26 @@ function showColumnQuestion(){
             formula
         );
 
-    document.getElementById(
-        "progress"
-    ).innerHTML = `
+   document.getElementById(
+    "progress"
+).innerHTML = `
+
+    Resolviendo columna:
+    <b>${formula}</b>
+
+    <br>
+
+    Fila
+    ${currentRowInColumn + 1}
+    de
+    ${guidedTable.rows.length}
+
+    <br><br>
+
+    ❌ Errores:
+    <b>${mistakes}</b>
+
+`;
 
     Resolviendo columna:
     <b>${formula}</b>
@@ -1141,6 +1161,11 @@ function checkColumnAnswer(answer){
 
             <div class="step">
                 🎉 ¡Tabla completada!
+
+<br><br>
+
+❌ Errores cometidos:
+<b>${mistakes}</b>
             </div>
 
             `;
@@ -1161,17 +1186,22 @@ function checkColumnAnswer(answer){
     }
 
     // RESPUESTA INCORRECTA
-    else{
+  else{
 
-        feedback.innerHTML = `
+    mistakes++;
 
-        <div class="feedback wrong">
-            ❌ Intenta nuevamente
-        </div>
+    feedback.innerHTML = `
 
-        `;
+    <div class="feedback wrong">
+        ❌ Intenta nuevamente
+    </div>
 
-    }
+    `;
+
+    // actualizar contador visual
+    showColumnQuestion();
+
+}
 
 }
 
