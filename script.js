@@ -718,7 +718,7 @@ if(
 function startGuidedMode(){
     mistakes = 0;
     currentRowInColumn = 0;
-
+    
     const formula =
         document.getElementById("formula")
         .value
@@ -780,7 +780,7 @@ if(!isValidFormula(formula)){
     currentColumn =
         vars.length;
 
-    currentRowInColumn = 0;
+    
 
     renderGuidedTable();
 
@@ -1104,7 +1104,10 @@ function checkColumnAnswer(answer){
             "feedback"
         );
 
+    // =========================
     // RESPUESTA CORRECTA
+    // =========================
+
     if(answer === currentAnswer){
 
         // limpiar feedback
@@ -1114,18 +1117,17 @@ function checkColumnAnswer(answer){
         let formula =
             guidedTable.columns[currentColumn];
 
-        // guardar resultado en la fila actual
+        // guardar resultado
         guidedTable.rows[currentRowInColumn][formula]
             = answer;
 
-        // REDIBUJAR inmediatamente
-        // para que aparezca el último valor
+        // redibujar tabla
         renderGuidedTable();
 
         // avanzar fila
         currentRowInColumn++;
 
-        // terminó la columna
+        // terminó columna
         if(
             currentRowInColumn >=
             guidedTable.rows.length
@@ -1137,74 +1139,102 @@ function checkColumnAnswer(answer){
 
         }
 
+        // =========================
         // TERMINÓ TODA LA TABLA
+        // =========================
+
         if(
             currentColumn >=
             guidedTable.columns.length
         ){
 
-            // redibujar tabla final completa
             renderGuidedTable();
 
-            // limpiar progreso
             document.getElementById(
                 "progress"
             ).innerHTML = "";
 
-            // limpiar feedback
             feedback.innerHTML = "";
 
-            // mensaje final
             document.getElementById(
                 "questionArea"
             ).innerHTML = `
 
             <div class="step">
+
                 🎉 ¡Tabla completada!
 
-<br><br>
+                <br><br>
 
-❌ Errores cometidos:
-<b>${mistakes}</b>
+                ❌ Errores cometidos:
+                <b>${mistakes}</b>
+
             </div>
 
             `;
+
+            // limpiar textarea
             document.getElementById(
-    "formula"
-).value = "";
+                "formula"
+            ).value = "";
 
             return;
 
         }
 
-        // redibujar nueva columna/fila activa
+        // actualizar siguiente pregunta
         renderGuidedTable();
 
-        // siguiente pregunta
         showColumnQuestion();
 
     }
 
+    // =========================
     // RESPUESTA INCORRECTA
-  else{
+    // =========================
 
-    mistakes++;
+    else{
 
-    feedback.innerHTML = `
+        mistakes++;
 
-    <div class="feedback wrong">
-        ❌ Intenta nuevamente
-    </div>
+        // actualizar progreso
+        let formula =
+            guidedTable.columns[currentColumn];
 
-    `;
+        document.getElementById(
+            "progress"
+        ).innerHTML = `
 
-    // actualizar contador visual
-    showColumnQuestion();
+        Resolviendo columna:
+        <b>${formula}</b>
+
+        <br>
+
+        Fila
+        ${currentRowInColumn + 1}
+        de
+        ${guidedTable.rows.length}
+
+        <br><br>
+
+        ❌ Errores:
+        <b>${mistakes}</b>
+
+        `;
+
+        feedback.innerHTML = `
+
+        <div class="feedback wrong">
+
+            ❌ Intenta nuevamente
+
+        </div>
+
+        `;
+
+    }
 
 }
-
-}
-
 function deleteLastSymbol(){
 
     const textarea =
