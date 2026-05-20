@@ -1360,25 +1360,27 @@ function getOperatorHelpHTML(op){
 // =====================================================
 
 const OPERATOR_GAME_CHALLENGES = [
-    // Nivel 1 — básico
-    { formula: "p∧q",          hint: "Solo hay un operador. ¿Cuál es?", level: 1 },
-    { formula: "p∨q",          hint: "Solo hay un operador binario.", level: 1 },
-    { formula: "p→q",          hint: "Solo hay un operador binario.", level: 1 },
-    { formula: "¬p",           hint: "Solo hay un operador.", level: 1 },
-    { formula: "p↔q",          hint: "Solo hay un operador binario.", level: 1 },
-    // Nivel 2 — paréntesis simples
-    { formula: "¬(p∧q)",       hint: "¿La ¬ afecta solo a p, o a toda la expresión entre paréntesis?", level: 2 },
-    { formula: "(p∨q)∧r",      hint: "¿Qué operador conecta los dos grupos principales?", level: 2 },
-    { formula: "p→(q∨r)",      hint: "¿El → está dentro o fuera del paréntesis?", level: 2 },
-    { formula: "¬p∨q",         hint: "¿La ¬ afecta solo a p, o a toda la fórmula?", level: 2 },
-    { formula: "(p→q)↔r",      hint: "¿Qué operador está fuera del paréntesis?", level: 2 },
-    // Nivel 3 — avanzado
-    { formula: "¬(p→q)",       hint: "¿La ¬ actúa sobre toda la implicación?", level: 3 },
-    { formula: "(p∧q)→(r∨s)",  hint: "Hay operadores en ambos grupos. ¿Cuál conecta todo?", level: 3 },
-    { formula: "¬p∧¬q",        hint: "Hay dos negaciones. ¿Cuál es el operador principal?", level: 3 },
-    { formula: "(p↔q)∧¬r",     hint: "Hay un ∧ y una ¬. ¿Cuál conecta las dos partes?", level: 3 },
-    { formula: "¬(p∨q)→r",     hint: "¿El → o la ¬ es el operador principal?", level: 3 },
-    { formula: "(p∧¬q)∨r",     hint: "¿El ∨ está dentro o fuera del paréntesis?", level: 3 },
+ 
+    // Nivel 1 — paréntesis simples
+    { formula: "¬(p∧q)",       hint: "¿La ¬ afecta solo a p, o a toda la expresión entre paréntesis?", level: 1 },
+    { formula: "(p∨q)∧r",      hint: "¿Qué operador conecta los dos grupos principales?", level: 1 },
+    { formula: "p→(q∨r)",      hint: "¿El → está dentro o fuera del paréntesis?", level: 1 },
+    { formula: "¬p∨q",         hint: "¿La ¬ afecta solo a p, o a toda la fórmula?", level: 1 },
+    { formula: "(p→q)↔r",      hint: "¿Qué operador está fuera del paréntesis?", level: 1 },
+    // Nivel 2 — avanzado
+    { formula: "¬(p→q)",       hint: "¿La ¬ actúa sobre toda la implicación?", level: 2 },
+    { formula: "(p∧q)→(r∨s)",  hint: "Hay operadores en ambos grupos. ¿Cuál conecta todo?", level: 2 },
+    { formula: "¬p∧¬q",        hint: "Hay dos negaciones. ¿Cuál es el operador principal?", level: 2 },
+    { formula: "(p↔q)∧¬r",     hint: "Hay un ∧ y una ¬. ¿Cuál conecta las dos partes?", level: 2 },
+    { formula: "¬(p∨q)→r",     hint: "¿El → o la ¬ es el operador principal?", level: 2 },
+    { formula: "(p∧¬q)∨r",     hint: "¿El ∨ está dentro o fuera del paréntesis?", level: 2 },
+    // Nivel 3 — Desafío total (anidamientos y negaciones complejas)
+    { formula: "¬[(p→q)∧(r∨s)]", hint: "Mirá el corchete completo. ¿Hay algún operador que afecte a absolutamente todo lo que está adentro?", level: 3 },
+    { formula: "[(p∧q)→r]↔(¬s∨t)", hint: "Tenemos dos bloques grandes entre corchetes y paréntesis. ¿Qué conector une esos dos bloques principales?", level: 3 },
+    { formula: "¬(p→¬q)∧(r↔¬s)", hint: "Tenés una conjunción (∧) en el medio. ¿Las negaciones de los extremos afectan a toda la fórmula o solo a sus bloques?", level: 3 },
+    { formula: "p→[q∨(r∧¬s)]", hint: "El condicional está al principio. ¿Todo lo demás está agrupado dentro del corchete?", level: 3 },
+    { formula: "¬{[(p∧q)→r]∨s}", hint: "Fijate en las llaves externas. ¿Qué operador está modificando a toda la estructura molecular?", level: 3 },
+    { formula: "[(p↔q)∧¬r]→(s∧¬t)", hint: "Identificá las dos premisas mayores. ¿Cuál es el operador que establece la relación de causa y efecto entre ellas?", level: 3 },
 ];
 
 let operatorGame = {
