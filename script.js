@@ -649,6 +649,19 @@ function startGuidedMode(){
 
     if(operatorGame.active) exitOperatorGame();
 
+    // Si no viene del pipeline, mostrar selector de nivel primero
+    if(gameState.phase !== 'table_solving'){
+        const f = document.getElementById("formula").value.trim();
+        if(f === "") return;
+        if(!isValidFormula(f)){
+            alert("La fórmula lógica no es válida");
+            return;
+        }
+        gameState.formula = f;
+        showGuidedLevelSelector();
+        return;
+    }
+
     mistakes = 0;
     guidedScore = 0;
     guidedStreak = 0;
@@ -994,6 +1007,9 @@ function showGuidedEnd(){
     `;
 
     document.getElementById("formula").value = "";
+    gameState.phase     = 'idle';
+    gameState.formula   = '';
+    gameState.solveLevel = 'principiante';
 }
 
 function updateGuidedProgress(){
@@ -1130,6 +1146,33 @@ function clearFormula(){
 }
 
 
+
+function showGuidedLevelSelector(){
+    clearMainAreas();
+    document.getElementById("questionArea").innerHTML = `
+        <div class="ogEndCard levelSelectorCard">
+            <div class="ogEndMedal">🧩</div>
+            <h2 class="ogEndTitle">Resolver Conmigo</h2>
+            <p class="ogEndMsg">Elegí cómo querés resolver<br><b>${gameState.formula}</b>:</p>
+            <div class="levelSelectorBtns">
+                <button class="levelBtn levelBtn-principiante"
+                        onclick="startGuidedModeFromPipeline('principiante')"
+                        aria-label="Nivel principiante: paso a paso guiado">
+                    <span class="levelBtnIcon">📚</span>
+                    <span class="levelBtnLabel">Principiante</span>
+                    <span class="levelBtnDesc">Paso a paso guiado</span>
+                </button>
+                <button class="levelBtn levelBtn-asistido"
+                        onclick="startGuidedModeFromPipeline('asistido')"
+                        aria-label="Nivel asistido: Smart Fill disponible">
+                    <span class="levelBtnIcon">⚡</span>
+                    <span class="levelBtnLabel">Asistido</span>
+                    <span class="levelBtnDesc">Verificá patrones y autocompletá columnas</span>
+                </button>
+            </div>
+        </div>
+    `;
+}
 
 // =====================================================
 // MODO AUTOEVALUACIÓN (libre)
@@ -1360,7 +1403,6 @@ function getOperatorHelpHTML(op){
 // =====================================================
 
 const OPERATOR_GAME_CHALLENGES = [
- 
     // Nivel 1 — paréntesis simples
     { formula: "¬(p∧q)",       hint: "¿La ¬ afecta solo a p, o a toda la expresión entre paréntesis?", level: 1 },
     { formula: "(p∨q)∧r",      hint: "¿Qué operador conecta los dos grupos principales?", level: 1 },
@@ -1375,11 +1417,11 @@ const OPERATOR_GAME_CHALLENGES = [
     { formula: "¬(p∨q)→r",     hint: "¿El → o la ¬ es el operador principal?", level: 2 },
     { formula: "(p∧¬q)∨r",     hint: "¿El ∨ está dentro o fuera del paréntesis?", level: 2 },
     // Nivel 3 — Desafío total (anidamientos y negaciones complejas)
-    { formula: "¬[(p→q)∧(r∨s)]", hint: "Mirá el corchete completo. ¿Hay algún operador que afecte a absolutamente todo lo que está adentro?", level: 3 },
-    { formula: "[(p∧q)→r]↔(¬s∨t)", hint: "Tenemos dos bloques grandes entre corchetes y paréntesis. ¿Qué conector une esos dos bloques principales?", level: 3 },
-    { formula: "¬(p→¬q)∧(r↔¬s)", hint: "Tenés una conjunción (∧) en el medio. ¿Las negaciones de los extremos afectan a toda la fórmula o solo a sus bloques?", level: 3 },
-    { formula: "p→[q∨(r∧¬s)]", hint: "El condicional está al principio. ¿Todo lo demás está agrupado dentro del corchete?", level: 3 },
-    { formula: "¬{[(p∧q)→r]∨s}", hint: "Fijate en las llaves externas. ¿Qué operador está modificando a toda la estructura molecular?", level: 3 },
+    { formula: "¬[(p→q)∧(r∨s)]",    hint: "Mirá el corchete completo. ¿Hay algún operador que afecte a absolutamente todo lo que está adentro?", level: 3 },
+    { formula: "[(p∧q)→r]↔(¬s∨t)",  hint: "Tenemos dos bloques grandes entre corchetes y paréntesis. ¿Qué conector une esos dos bloques principales?", level: 3 },
+    { formula: "¬(p→¬q)∧(r↔¬s)",    hint: "Tenés una conjunción (∧) en el medio. ¿Las negaciones de los extremos afectan a toda la fórmula o solo a sus bloques?", level: 3 },
+    { formula: "p→[q∨(r∧¬s)]",       hint: "El condicional está al principio. ¿Todo lo demás está agrupado dentro del corchete?", level: 3 },
+    { formula: "¬{[(p∧q)→r]∨s}",     hint: "Fijate en las llaves externas. ¿Qué operador está modificando a toda la estructura molecular?", level: 3 },
     { formula: "[(p↔q)∧¬r]→(s∧¬t)", hint: "Identificá las dos premisas mayores. ¿Cuál es el operador que establece la relación de causa y efecto entre ellas?", level: 3 },
 ];
 
@@ -1408,20 +1450,25 @@ function shuffleArray(arr){
     return a;
 }
 
+// Helpers de agrupadores: paréntesis, corchetes y llaves se tratan como equivalentes en el juego.
+function isOpenBracket(ch)  { return ch === "(" || ch === "[" || ch === "{"; }
+function isCloseBracket(ch) { return ch === ")" || ch === "]" || ch === "}"; }
+function matchingClose(ch)  { return ch === "(" ? ")" : ch === "[" ? "]" : ch === "{" ? "}" : ""; }
+
 // Devuelve el índice (en la cadena original) del operador principal.
 function findMainOperatorPosition(formula){
 
-    // Encontrar el rango sin paréntesis externos
+    // Encontrar el rango sin agrupadores externos
     let start = 0;
     let end = formula.length;
 
     while(start < end){
-        if(formula[start] !== "(" || formula[end - 1] !== ")") break;
+        if(!isOpenBracket(formula[start]) || formula[end - 1] !== matchingClose(formula[start])) break;
         let balance = 0;
         let valid = true;
         for(let i = start; i < end - 1; i++){
-            if(formula[i] === "(") balance++;
-            if(formula[i] === ")") balance--;
+            if(isOpenBracket(formula[i]))  balance++;
+            if(isCloseBracket(formula[i])) balance--;
             if(balance === 0){ valid = false; break; }
         }
         if(valid){ start++; end--; }
@@ -1436,8 +1483,8 @@ function findMainOperatorPosition(formula){
         let balance = 0;
         let hasBinary = false;
         for(let i = 0; i < inner.length; i++){
-            if(inner[i] === "(") balance++;
-            if(inner[i] === ")") balance--;
+            if(isOpenBracket(inner[i]))  balance++;
+            if(isCloseBracket(inner[i])) balance--;
             if(balance === 0 && ["∧","∨","→","↔"].includes(inner[i])){
                 hasBinary = true;
                 break;
@@ -1451,8 +1498,8 @@ function findMainOperatorPosition(formula){
     for(let op of ops){
         let balance = 0;
         for(let i = sub.length - 1; i >= 0; i--){
-            if(sub[i] === ")") balance++;
-            if(sub[i] === "(") balance--;
+            if(isCloseBracket(sub[i])) balance++;
+            if(isOpenBracket(sub[i]))  balance--;
             if(balance === 0 && sub[i] === op) return start + i;
         }
     }
@@ -1460,12 +1507,12 @@ function findMainOperatorPosition(formula){
     return -1;
 }
 
-// Calcula la profundidad de paréntesis en la posición `pos`.
+// Calcula la profundidad de agrupadores en la posición `pos`.
 function getDepthAtPosition(formula, pos){
     let depth = 0;
     for(let i = 0; i < pos; i++){
-        if(formula[i] === "(") depth++;
-        if(formula[i] === ")") depth--;
+        if(isOpenBracket(formula[i]))  depth++;
+        if(isCloseBracket(formula[i])) depth--;
     }
     return depth;
 }
@@ -1555,7 +1602,7 @@ function renderClickableFormula(formula){
         if(OPS.includes(ch)){
             html += `<span class="clickableOp" data-pos="${i}"
                           onclick="checkOperatorAnswer(${i})">${ch}</span>`;
-        } else if(ch === "(" || ch === ")"){
+        } else if(isOpenBracket(ch) || isCloseBracket(ch)){
             html += `<span class="gameParen">${ch}</span>`;
         } else {
             html += `<span class="gameVar">${ch}</span>`;
@@ -1742,10 +1789,6 @@ function showOperatorGameEnd(){
 
     document.getElementById("progress").innerHTML = "";
 
-    let decompBtn = gameState.formula
-        ? `<button class="ogNextBtn decompTransitionBtn" onclick="startDecompositionPhase()">🌳 Árbol de subfórmulas →</button>`
-        : "";
-
     document.getElementById("questionArea").innerHTML = `
         <div class="ogEndCard">
             <div class="ogEndMedal">${medal}</div>
@@ -1766,7 +1809,7 @@ function showOperatorGameEnd(){
                 </div>
             </div>
             <div class="ogEndBtns">
-                ${decompBtn}
+                <button class="ogNextBtn decompTransitionBtn" onclick="tryStartDecomposition()">🌳 Árbol + Resolver →</button>
                 <button class="ogNextBtn"  onclick="startOperatorGame()">🔄 Jugar de nuevo</button>
                 <button class="ogRetryBtn" onclick="exitOperatorGame()">↩ Volver</button>
             </div>
@@ -1778,7 +1821,23 @@ function showOperatorGameEnd(){
 
 function exitOperatorGame(){
     operatorGame.active = false;
+    gameState.phase = 'idle';
     clearMainAreas();
+}
+
+function tryStartDecomposition(){
+    if(gameState.formula){
+        startDecompositionPhase();
+        return;
+    }
+    // No hay fórmula cargada: salir del juego y pedir una
+    exitOperatorGame();
+    document.getElementById("questionArea").innerHTML = `
+        <div class="freeModeHint">
+            📝 Ingresá una fórmula en el campo de arriba y tocá
+            <b>🎯 Operador Principal</b> para continuar al árbol y la tabla de verdad.
+        </div>
+    `;
 }
 
 
