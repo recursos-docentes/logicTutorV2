@@ -10,6 +10,27 @@ let guidedMaxStreak = 0;
 let guidedFreeMode = false;
 let freeCellSelected = false;
 
+// ── State machine ──────────────────────────────────────
+const gameState = {
+    phase:      'idle',          // 'idle' | 'operator' | 'decomposition' | 'table_solving'
+    formula:    '',
+    solveLevel: 'principiante'   // 'principiante' | 'asistido'
+};
+
+// ── Smart Fill ─────────────────────────────────────────
+let autoCompletedCells  = new Set(); // "colIdx,rowIdx"
+let manualCellsInColumn = 0;
+
+// ── Decomposition state ────────────────────────────────
+let decompositionState = {
+    formula:        '',
+    subformulas:    [],
+    currentOptions: [],
+    currentIndex:   0,
+    score:          0,
+    mistakes:       0
+};
+
 
 
 // =========================
@@ -635,6 +656,8 @@ function startGuidedMode(){
     guidedFreeMode = false;
     freeCellSelected = false;
     currentRowInColumn = 0;
+    autoCompletedCells  = new Set();
+    manualCellsInColumn = 0;
 
     const formula =
         document.getElementById("formula")
@@ -777,6 +800,8 @@ function renderGuidedTable(){
                     if(colIndex === currentColumn)     className += " activeCurrent";
                 }
 
+                if(autoCompletedCells.has(colIndex + ',' + rowIndex)) className += ' auto-completado';
+
                 text = value !== undefined ? (value ? "V" : "F") : "?";
             }
 
@@ -850,6 +875,7 @@ function checkColumnAnswer(answer){
         // Guardar respuesta y actualizar tabla
         guidedTable.rows[currentRowInColumn][formula] = answer;
         renderGuidedTable();
+        manualCellsInColumn++;
 
         // Puntaje
         guidedStreak++;
@@ -867,12 +893,19 @@ function checkColumnAnswer(answer){
             ? `<div class="ogStreakMsg">🔥 ¡Racha de ${guidedStreak}! +${bonus} extra</div>`
             : "";
 
+        let smartFillBtn = checkSmartFillEligibility()
+            ? `<button class="smartFillBtn" onclick="verificarYAutocompletar(); return false;">🤖 Autocompletar restantes</button>`
+            : "";
+
         feedback.innerHTML = `
             <div class="ogFeedback ogCorrect">
                 <div class="ogFeedbackTitle">✅ ¡Correcto! <span class="ogPoints">+${points} pts</span></div>
                 ${streakMsg}
                 <div class="ogExplanation">${explanation}</div>
-                <button class="ogNextBtn" onclick="advanceGuidedMode(); return false;">Continuar →</button>
+                <div class="ogAnswerActions">
+                    <button class="ogNextBtn" onclick="advanceGuidedMode(); return false;">Continuar →</button>
+                    ${smartFillBtn}
+                </div>
             </div>
         `;
 
@@ -910,8 +943,9 @@ function advanceGuidedMode(){
     currentRowInColumn++;
 
     if(currentRowInColumn >= guidedTable.rows.length){
-        currentRowInColumn = 0;
+        currentRowInColumn   = 0;
         currentColumn++;
+        manualCellsInColumn  = 0;
     }
 
     if(currentColumn >= guidedTable.columns.length){
@@ -1227,33 +1261,63 @@ function closeHelpModal(e){
     }
 }
 
+// Filas de cada operador dentro de conectivas.png (top%, height%)
+// Calibradas para imagen 1359×1157px. Ajustar si la imagen cambia.
+const CONECTIVAS_ROWS = {
+    '¬': [19, 16],
+    '∧': [33, 16],
+    '∨': [47, 16],
+    '→': [61, 16],
+    '↔': [75, 15]
+};
+
 function buildHelpContent(){
-    let currentOp = null;
+    let currentOp      = null;
+    let currentFormula = '';
 
     if(guidedTable.columns && currentColumn >= 0 && currentColumn < guidedTable.columns.length){
-        currentOp = getMainOperatorChar(guidedTable.columns[currentColumn]);
+        currentFormula = guidedTable.columns[currentColumn];
+        currentOp      = getMainOperatorChar(currentFormula);
     }
 
-    let html = "";
+    // Spotlight overlay sobre la fila del operador activo
+    let overlayHtml = '';
+    if(currentOp && CONECTIVAS_ROWS[currentOp]){
+        let [top, h] = CONECTIVAS_ROWS[currentOp];
+        overlayHtml = `<div class="helpOverlay" style="top:${top}%;height:${h}%" aria-hidden="true"></div>`;
+    }
 
+    // Tarjeta de contexto: qué está resolviendo ahora mismo
+    const opNames = {'¬':'Negación','∧':'Conjunción','∨':'Disyunción','→':'Implicación','↔':'Bicondicional'};
+    let contextCard = '';
     if(currentOp){
-        html += `
+        contextCard = `
             <div class="helpContext">
-                Estás resolviendo: <b>${guidedTable.columns[currentColumn]}</b><br>
-                Operador principal: <b>${currentOp}</b>
+                Resolviendo: <b>${currentFormula}</b><br>
+                Operador principal: <b>${currentOp}</b> — ${opNames[currentOp] || ''}
             </div>
-            <div class="helpHighlightCard">${getOperatorHelpHTML(currentOp)}</div>
-            <div class="helpDivider">── Referencia completa ──</div>
         `;
     }
 
-    ["¬","∧","∨","→","↔"].forEach(op => {
-        html += `<div class="helpOpCard ${op === currentOp ? "helpOpActive" : ""}">
-                    ${getOperatorHelpHTML(op)}
-                 </div>`;
-    });
+    // Tabla de verdad suplementaria: solo el operador activo (o todas si no hay contexto)
+    let detailHtml = currentOp
+        ? `<div class="helpDivider">── Tabla de verdad ──</div>
+           <div class="helpHighlightCard">${getOperatorHelpHTML(currentOp)}</div>`
+        : `<div class="helpDivider">── Referencia completa ──</div>
+           ${["¬","∧","∨","→","↔"].map(op =>
+               `<div class="helpOpCard">${getOperatorHelpHTML(op)}</div>`
+           ).join('')}`;
 
-    return html;
+    return `
+        ${contextCard}
+        <div class="helpImageWrapper">
+            <img src="conectivas.png"
+                 alt="Tabla de conectivas lógicas"
+                 class="helpConnectivesImg" />
+            ${overlayHtml}
+        </div>
+        ${detailHtml}
+    `;
 }
 
 function getOperatorHelpHTML(op){
@@ -1518,8 +1582,12 @@ function startOperatorGame(){
         pool.push({ formula: userFormula, hint: "¡Esta es tu propia fórmula!", level: 2 });
     }
 
+    gameState.phase   = 'operator';
+    gameState.formula = (userFormula && isValidFormula(userFormula) && !/^[a-z]$/i.test(userFormula))
+        ? userFormula : '';
+
     operatorGame.active    = true;
-    operatorGame.questions = shuffleArray(pool);
+    operatorGame.questions = shuffleArray(pool).slice(0, 5);
     operatorGame.currentIndex = 0;
     operatorGame.score     = 0;
     operatorGame.streak    = 0;
@@ -1672,6 +1740,10 @@ function showOperatorGameEnd(){
 
     document.getElementById("progress").innerHTML = "";
 
+    let decompBtn = gameState.formula
+        ? `<button class="ogNextBtn decompTransitionBtn" onclick="startDecompositionPhase()">🌳 Árbol de subfórmulas →</button>`
+        : "";
+
     document.getElementById("questionArea").innerHTML = `
         <div class="ogEndCard">
             <div class="ogEndMedal">${medal}</div>
@@ -1692,6 +1764,7 @@ function showOperatorGameEnd(){
                 </div>
             </div>
             <div class="ogEndBtns">
+                ${decompBtn}
                 <button class="ogNextBtn"  onclick="startOperatorGame()">🔄 Jugar de nuevo</button>
                 <button class="ogRetryBtn" onclick="exitOperatorGame()">↩ Volver</button>
             </div>
@@ -1707,6 +1780,265 @@ function exitOperatorGame(){
 }
 
 
+
+// =====================================================
+// SMART FILL: verificación e autocompletado
+// =====================================================
+
+function checkSmartFillEligibility(){
+    if(gameState.solveLevel !== 'asistido') return false;
+    if(!guidedTable.rows || !guidedTable.columns) return false;
+
+    let col  = guidedTable.columns[currentColumn];
+    let rows = guidedTable.rows;
+
+    let remaining = rows.filter(r => r[col] === undefined).length;
+    if(remaining === 0) return false;
+
+    // Condición 1: todas las filas V ya están completadas
+    let allVFilled = rows.every(r => {
+        return !solveSubformula(col, r) || r[col] !== undefined;
+    });
+    if(allVFilled) return true;
+
+    // Condición 2: al menos 2 filas completadas manualmente
+    return manualCellsInColumn >= 2;
+}
+
+function verificarYAutocompletar(){
+    let col    = guidedTable.columns[currentColumn];
+    let colIdx = currentColumn;
+
+    guidedTable.rows.forEach((row, rowIdx) => {
+        if(row[col] === undefined){
+            guidedTable.rows[rowIdx][col] = solveSubformula(col, row);
+            autoCompletedCells.add(colIdx + ',' + rowIdx);
+        }
+    });
+
+    renderGuidedTable();
+
+    const opNames = {'∧':'conjunción','∨':'disyunción','→':'implicación','↔':'bicondicional','¬':'negación'};
+    let op     = getMainOperatorChar(col);
+    let opName = op ? (opNames[op] || op) : 'operador';
+
+    document.getElementById("feedback").innerHTML = `
+        <div class="ogFeedback ogCorrect">
+            <div class="ogFeedbackTitle">🤖 ¡Columna completada!</div>
+            <div class="ogExplanation">
+                Verificaste el patrón de la <b>${opName}</b> correctamente.
+                Las celdas con borde punteado fueron autocompletadas.
+            </div>
+            <button class="ogNextBtn" onclick="advanceAfterSmartFill(); return false;">Continuar →</button>
+        </div>
+    `;
+}
+
+function advanceAfterSmartFill(){
+    currentRowInColumn  = 0;
+    currentColumn++;
+    manualCellsInColumn = 0;
+    document.getElementById("feedback").innerHTML = "";
+
+    if(currentColumn >= guidedTable.columns.length){
+        renderGuidedTable();
+        showGuidedEnd();
+        return;
+    }
+
+    renderGuidedTable();
+    showColumnQuestion();
+}
+
+// =====================================================
+// DESCOMPOSICIÓN: ÁRBOL DE SUBFÓRMULAS
+// =====================================================
+
+function startDecompositionPhase(){
+    gameState.phase = 'decomposition';
+    let formula     = gameState.formula;
+
+    let subs = extractSubformulas(formula).filter(
+        f => !/^[a-z]$/i.test(f.replace(/[()¬]/g, ''))
+    );
+
+    decompositionState = {
+        formula,
+        subformulas:    subs,
+        currentOptions: [],
+        currentIndex:   0,
+        score:          0,
+        mistakes:       0
+    };
+
+    clearMainAreas();
+    renderDecompositionQuestion();
+}
+
+function generateDecompositionDistractors(correct, formula, allSubs){
+    let pool = new Set();
+
+    // Otras subfórmulas de la misma fórmula
+    allSubs.forEach(s => { if(s !== correct) pool.add(s); });
+
+    // Variantes cambiando operador
+    let op   = getMainOperatorChar(correct);
+    let deps = getDirectDependencies(correct);
+    if(deps.length === 2){
+        ['∧','∨','→','↔'].filter(o => o !== op).forEach(o => {
+            pool.add('(' + deps[0] + o + deps[1] + ')');
+        });
+    } else if(op === '¬' && deps.length === 1){
+        pool.add(deps[0]);
+    }
+
+    // Variables como distractor de último recurso
+    getVariables(formula).forEach(v => pool.add(v));
+
+    return shuffleArray([...pool].filter(d => d !== correct)).slice(0, 3);
+}
+
+function renderDecompositionQuestion(){
+    let ds = decompositionState;
+
+    if(ds.currentIndex >= ds.subformulas.length){
+        showDecompositionEnd();
+        return;
+    }
+
+    let correct     = ds.subformulas[ds.currentIndex];
+    let distractors = generateDecompositionDistractors(correct, ds.formula, ds.subformulas);
+    let options     = shuffleArray([correct, ...distractors]);
+    ds.currentOptions = options;
+
+    let total   = ds.subformulas.length;
+    let current = ds.currentIndex + 1;
+    let op      = getMainOperatorChar(correct);
+    const opNames = {'∧':'conjunción','∨':'disyunción','→':'implicación','↔':'bicondicional','¬':'negación'};
+    let opName = op ? (opNames[op] || op) : '?';
+
+    document.getElementById("progress").innerHTML = `
+        <div class="gameProgressBar">
+            <span class="gpItem">🌳 Árbol ${current}/${total}</span>
+            <span class="gpItem gpScore">⭐ ${ds.score} pts</span>
+            <span class="gpItem">❌ ${ds.mistakes}</span>
+            <button class="gpExit" onclick="exitDecomposition()">✕ Salir</button>
+        </div>
+    `;
+
+    document.getElementById("questionArea").innerHTML = `
+        <div class="operatorGameCard">
+            <div class="ogInstruction">
+                Identificá la subfórmula con operador <b>${op || '?'}</b> (${opName}):
+            </div>
+            <div class="decompFormula" aria-label="Fórmula: ${ds.formula}">${ds.formula}</div>
+            <div class="decompOptions" id="decompOptions" role="group" aria-label="Opciones">
+                ${options.map((opt, i) => `
+                    <button class="decompOptBtn"
+                            onclick="checkDecompositionAnswer(${i})"
+                            aria-label="Opción ${i + 1}: ${opt}">
+                        ${opt}
+                    </button>
+                `).join('')}
+            </div>
+        </div>
+    `;
+
+    document.getElementById("feedback").innerHTML = "";
+}
+
+function checkDecompositionAnswer(idx){
+    let ds      = decompositionState;
+    let correct = ds.subformulas[ds.currentIndex];
+    let chosen  = ds.currentOptions[idx];
+    let isOk    = (chosen === correct);
+
+    document.querySelectorAll("#decompOptions .decompOptBtn").forEach((btn, i) => {
+        btn.disabled = true;
+        if(ds.currentOptions[i] === correct) btn.classList.add("decompOptCorrect");
+        if(i === idx && !isOk)               btn.classList.add("decompOptWrong");
+    });
+
+    if(isOk){
+        ds.score += 10;
+        let deps    = getDirectDependencies(correct);
+        let depsStr = deps.map(d => `<b>${d}</b>`).join(' y ');
+        document.getElementById("feedback").innerHTML = `
+            <div class="ogFeedback ogCorrect">
+                <div class="ogFeedbackTitle">✅ ¡Correcto! <span class="ogPoints">+10 pts</span></div>
+                <div class="ogExplanation">
+                    La subfórmula <b>${correct}</b> se compone de ${depsStr}.
+                </div>
+                <button class="ogNextBtn" onclick="advanceDecomposition()">Continuar →</button>
+            </div>
+        `;
+    } else {
+        ds.mistakes++;
+        document.getElementById("feedback").innerHTML = `
+            <div class="ogFeedback ogWrong">
+                <div class="ogFeedbackTitle">❌ No es esa</div>
+                <div class="ogExplanation">La subfórmula correcta es <b>${correct}</b>.</div>
+                <button class="ogNextBtn" onclick="advanceDecomposition()">Continuar →</button>
+            </div>
+        `;
+    }
+}
+
+function advanceDecomposition(){
+    decompositionState.currentIndex++;
+    renderDecompositionQuestion();
+}
+
+function showDecompositionEnd(){
+    document.getElementById("progress").innerHTML = "";
+    document.getElementById("feedback").innerHTML = "";
+
+    document.getElementById("questionArea").innerHTML = `
+        <div class="ogEndCard">
+            <div class="ogEndMedal">🌳</div>
+            <h2 class="ogEndTitle">¡Árbol completado!</h2>
+            <p class="ogEndMsg">
+                Entendiste la estructura de <b>${decompositionState.formula}</b>.<br>
+                Ahora resolvé la tabla de verdad completa.
+            </p>
+            <div class="ogEndStats">
+                <div class="ogStat">
+                    <span class="ogStatVal">⭐ ${decompositionState.score}</span>
+                    <span class="ogStatLabel">puntos</span>
+                </div>
+                <div class="ogStat">
+                    <span class="ogStatVal">❌ ${decompositionState.mistakes}</span>
+                    <span class="ogStatLabel">errores</span>
+                </div>
+            </div>
+            <p class="decompLevelPrompt">Elegí el nivel de ayuda:</p>
+            <div class="ogEndBtns">
+                <button class="ogNextBtn"
+                        onclick="startGuidedModeFromPipeline('principiante')"
+                        aria-label="Nivel principiante: paso a paso guiado">
+                    📚 Principiante
+                </button>
+                <button class="ogRetryBtn"
+                        onclick="startGuidedModeFromPipeline('asistido')"
+                        aria-label="Nivel asistido: Smart Fill disponible">
+                    ⚡ Asistido (Smart Fill)
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+function exitDecomposition(){
+    gameState.phase = 'idle';
+    clearMainAreas();
+}
+
+function startGuidedModeFromPipeline(level){
+    gameState.solveLevel = level;
+    gameState.phase      = 'table_solving';
+    document.getElementById("formula").value = gameState.formula;
+    startGuidedMode();
+}
 
 // DEBUG
 console.log("Logic Tutor cargado correctamente");

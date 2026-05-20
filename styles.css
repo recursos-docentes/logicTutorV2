@@ -656,6 +656,50 @@ th.activeRow.currentColumn{ background:#ffcccc !important; }
     color:#c0392b;
 }
 
+/* Imagen principal de conectivas */
+.helpImageWrapper{
+    position:relative;
+    display:block;
+    width:100%;
+    border-radius:12px;
+    overflow:hidden;
+    margin:0 0 16px;
+    box-shadow:0 2px 14px rgba(0,0,0,0.12);
+}
+
+.helpConnectivesImg{
+    width:100%;
+    height:auto;
+    display:block;
+    border-radius:12px;
+}
+
+/* Spotlight sobre la fila del operador activo */
+.helpOverlay{
+    position:absolute;
+    left:0;
+    right:0;
+    border:3px solid rgba(255,140,0,0.95);
+    border-radius:6px;
+    box-shadow:
+        0 0 0 9999px rgba(0,0,0,0.42),
+        0 0 24px rgba(255,140,0,0.65);
+    pointer-events:none;
+    z-index:2;
+    animation:helpPulse 2.2s ease-in-out infinite;
+}
+
+@keyframes helpPulse{
+    0%,100%{
+        border-color:rgba(255,140,0,0.95);
+        box-shadow:0 0 0 9999px rgba(0,0,0,0.42),0 0 24px rgba(255,140,0,0.65);
+    }
+    50%{
+        border-color:rgba(255,210,0,1);
+        box-shadow:0 0 0 9999px rgba(0,0,0,0.42),0 0 42px rgba(255,210,0,0.9);
+    }
+}
+
 /* Contexto actual */
 .helpContext{
     background:#eef5ff;
@@ -738,6 +782,126 @@ th.activeRow.currentColumn{ background:#ffcccc !important; }
 .helpFalse{
     background:#cfe1ff;
     font-weight:bold;
+}
+
+/* ======================================
+   SMART FILL: celdas autocompletadas
+   ====================================== */
+
+td.auto-completado{
+    border: 2px dashed #9b59ff !important;
+    background: #f5f0ff !important;
+    color: #6c3483;
+    font-style: italic;
+    position: relative;
+}
+
+/* Botón Autocompletar restantes */
+.smartFillBtn{
+    background: #8e44ad;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 12px 22px;
+    font-size: 17px;
+    cursor: pointer;
+    transition: 0.2s;
+    margin: 4px;
+}
+
+.smartFillBtn:hover{
+    background: #6c3483;
+    transform: translateY(-2px);
+}
+
+/* Contenedor de acciones (Continuar + Smart Fill) */
+.ogAnswerActions{
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+/* ======================================
+   DESCOMPOSICIÓN: ÁRBOL DE SUBFÓRMULAS
+   ====================================== */
+
+/* Fórmula de referencia */
+.decompFormula{
+    font-size: 30px;
+    font-weight: bold;
+    color: #29527a;
+    background: white;
+    border-radius: 12px;
+    padding: 12px 20px;
+    margin-bottom: 24px;
+    display: inline-block;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    letter-spacing: 2px;
+}
+
+/* Grid de opciones */
+.decompOptions{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 8px;
+}
+
+/* Botón de opción */
+.decompOptBtn{
+    background: #f0f4ff;
+    color: #2c3e50;
+    border: 2px solid #aac7ff;
+    border-radius: 14px;
+    padding: 14px 22px;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, transform 0.15s;
+    letter-spacing: 1px;
+}
+
+.decompOptBtn:hover:not(:disabled){
+    background: #d0e4ff;
+    border-color: #4a7dff;
+    transform: translateY(-3px);
+}
+
+.decompOptBtn:disabled{
+    cursor: default;
+}
+
+.decompOptCorrect{
+    background: #eafaf1 !important;
+    border-color: #27ae60 !important;
+    color: #1e8449 !important;
+    animation: popIn 0.35s ease;
+}
+
+.decompOptWrong{
+    background: #fef9f9 !important;
+    border-color: #e74c3c !important;
+    color: #c0392b !important;
+    animation: shake 0.35s ease;
+}
+
+/* Texto de selección de nivel */
+.decompLevelPrompt{
+    font-size: 17px;
+    color: #555;
+    margin-bottom: 16px;
+    margin-top: 0;
+}
+
+/* Botón de transición al árbol (en end screen del juego) */
+.decompTransitionBtn{
+    background: #27ae60 !important;
+}
+
+.decompTransitionBtn:hover{
+    background: #1e8449 !important;
 }
 
 /* ======================================
