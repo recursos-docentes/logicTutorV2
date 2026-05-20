@@ -42,12 +42,12 @@
 
         <!-- ENTRADA -->
 
-     <textarea
-    id="formula"
-    spellcheck="false"
-    readonly
-    placeholder="Ejemplo: ((p∨q)→¬r)">
-</textarea>
+        <textarea
+            id="formula"
+            spellcheck="false"
+            readonly
+            placeholder="Ejemplo: ((p∨q)→¬r)">
+        </textarea>
 
 
 
@@ -61,36 +61,28 @@
                 type="button"
                 class="symbolBtn variableBtn"
                 onclick="insertSymbol('p'); return false;">
-
                 p
-
             </button>
 
             <button
                 type="button"
                 class="symbolBtn variableBtn"
                 onclick="insertSymbol('q'); return false;">
-
                 q
-
             </button>
 
             <button
                 type="button"
                 class="symbolBtn variableBtn"
                 onclick="insertSymbol('r'); return false;">
-
                 r
-
             </button>
 
             <button
                 type="button"
                 class="symbolBtn variableBtn"
                 onclick="insertSymbol('s'); return false;">
-
                 s
-
             </button>
 
 
@@ -101,63 +93,49 @@
                 type="button"
                 class="symbolBtn connectorBtn"
                 onclick="insertSymbol('∧'); return false;">
-
                 ∧
-
             </button>
 
             <button
                 type="button"
                 class="symbolBtn connectorBtn"
                 onclick="insertSymbol('∨'); return false;">
-
                 ∨
-
             </button>
 
             <button
                 type="button"
                 class="symbolBtn connectorBtn"
                 onclick="insertSymbol('¬'); return false;">
-
                 ¬
-
             </button>
 
             <button
                 type="button"
                 class="symbolBtn connectorBtn"
                 onclick="insertSymbol('→'); return false;">
-
                 →
-
             </button>
 
             <button
                 type="button"
                 class="symbolBtn connectorBtn"
                 onclick="insertSymbol('↔'); return false;">
-
                 ↔
-
             </button>
 
             <button
                 type="button"
                 class="symbolBtn connectorBtn"
                 onclick="insertSymbol('('); return false;">
-
                 (
-
             </button>
 
             <button
                 type="button"
                 class="symbolBtn connectorBtn"
                 onclick="insertSymbol(')'); return false;">
-
                 )
-
             </button>
 
 
@@ -168,9 +146,7 @@
                 type="button"
                 class="symbolBtn deleteBtn"
                 onclick="deleteLastSymbol(); return false;">
-
                 ⌫
-
             </button>
 
 
@@ -181,9 +157,7 @@
                 type="button"
                 class="symbolBtn clearBtn"
                 onclick="clearFormula(); return false;">
-
                 🗑
-
             </button>
 
         </div>
@@ -197,9 +171,14 @@
             <button
                 type="button"
                 onclick="startGuidedMode(); return false;">
-
                 🧩 Resolver Conmigo
+            </button>
 
+            <button
+                type="button"
+                class="gameBtn"
+                onclick="startOperatorGame(); return false;">
+                🎯 Operador Principal
             </button>
 
         </div>

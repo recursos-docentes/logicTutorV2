@@ -6,10 +6,6 @@ body{
     color:#333;
 }
 
-
-
-/* CONTENEDOR */
-
 .container{
     max-width:1200px;
     margin:auto;
@@ -18,10 +14,6 @@ body{
     border-radius:20px;
     box-shadow:0 0 15px rgba(0,0,0,0.1);
 }
-
-
-
-/* TITULOS */
 
 h1{
     text-align:center;
@@ -33,10 +25,6 @@ h1{
     margin-bottom:20px;
     font-size:18px;
 }
-
-
-
-/* IMAGEN */
 
 .instructions-image{
     display:flex;
@@ -52,10 +40,6 @@ h1{
     box-shadow:0 4px 12px rgba(0,0,0,0.08);
 }
 
-
-
-/* TEXTAREA */
-
 textarea{
     width:100%;
     box-sizing:border-box;
@@ -67,44 +51,55 @@ textarea{
     resize:none;
 }
 
-
-
-/* BOTONES SIMBOLOS */
-
 .symbols{
     display:flex;
-    gap:10px;
+    justify-content:center;
+    align-items:center;
     flex-wrap:wrap;
+    gap:12px;
     margin-top:20px;
 }
 
 .symbolBtn{
-    background:#8aaeff;
-    padding:10px;
+    min-width:65px;
+    height:60px;
     border:none;
-    border-radius:10px;
-    font-size:22px;
-    min-width:60px;
+    border-radius:14px;
+    font-size:26px;
+    font-weight:bold;
     color:white;
     cursor:pointer;
     transition:0.2s;
 }
 
 .symbolBtn:hover{
-    background:#5f8dff;
+    transform:translateY(-2px);
+    opacity:0.9;
 }
 
 .variableBtn{
-    background:#6c8cff;
+    background:#4f8cff;
 }
 
-.variableBtn:hover{
-    background:#4f6fe0;
+.connectorBtn{
+    background:#9b59ff;
 }
 
+.deleteBtn{
+    background:#ff9f43;
+}
 
+.deleteBtn:hover{
+    background:#ff7f00;
+}
 
-/* BOTONES PRINCIPALES */
+.clearBtn{
+    background:#ff5c5c;
+}
+
+.clearBtn:hover{
+    background:#e63939;
+}
 
 .buttons{
     display:flex;
@@ -130,9 +125,14 @@ textarea{
     background:#3565dd;
 }
 
+/* Botón del juego */
+.buttons .gameBtn{
+    background:#e67e22;
+}
 
-
-/* TABLA */
+.buttons .gameBtn:hover{
+    background:#ca6f1e;
+}
 
 table{
     width:100%;
@@ -141,54 +141,36 @@ table{
     font-size:20px;
 }
 
-th,
-td{
+th,td{
     border:1px solid #ccc;
     padding:12px;
     text-align:center;
 }
 
+.completedColumn{ background:#fff5bf; }
+.currentColumn{   background:#ffdede; }
+.dependencyColumn{ background:#fff5bf; }
 
+.true{ background:#c9f7c5; font-weight:bold; }
+.false{ background:#cfe1ff; font-weight:bold; }
 
-/* COLUMNAS YA RESUELTAS */
+.activeRow{ background:#fff6bf !important; }
 
-.completedColumn{
-    background:#fff5bf;
+td.activeRow.dependencyColumn,
+th.activeRow.dependencyColumn{ background:#ffe58f !important; }
+
+td.activeRow.currentColumn,
+th.activeRow.currentColumn{ background:#ffcccc !important; }
+
+.activeDependency{
+    background:#ffe58f !important;
+    box-shadow:inset 0 0 0 3px #f5c542;
 }
 
-
-
-/* COLUMNA ACTUAL */
-
-.currentColumn{
-    background:#ffdede;
+.activeCurrent{
+    background:#ffb3b3 !important;
+    box-shadow:inset 0 0 0 3px #ff6b6b;
 }
-
-
-
-/* COLORES V/F */
-
-.true{
-    background:#c9f7c5;
-    font-weight:bold;
-}
-
-.false{
-    background:#cfe1ff;
-    font-weight:bold;
-}
-
-.dependencyColumn{
-    background:#fff5bf;
-}
-
-.currentColumn{
-    background:#ffdede;
-}
-
-
-
-/* PREGUNTA */
 
 .question{
     margin-top:20px;
@@ -198,10 +180,6 @@ td{
     border-radius:15px;
 }
 
-
-
-/* VARIABLES EN HORIZONTAL */
-
 .variablesRow{
     display:flex;
     gap:30px;
@@ -209,22 +187,6 @@ td{
     margin-top:20px;
     margin-bottom:20px;
     align-items:center;
-}
-
-.variableBox{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    font-size:28px;
-}
-
-.variablesRow{
-    display:flex;
-    gap:30px;
-    flex-wrap:wrap;
-    align-items:center;
-    margin-top:20px;
-    margin-bottom:20px;
 }
 
 .variableBox{
@@ -237,10 +199,7 @@ td{
     box-shadow:0 2px 6px rgba(0,0,0,0.08);
 }
 
-.variableName{
-    font-size:28px;
-    font-weight:bold;
-}
+.variableName{ font-size:28px; font-weight:bold; }
 
 .variableValue{
     width:45px;
@@ -254,15 +213,8 @@ td{
     font-weight:bold;
 }
 
-.valueTrue{
-    background:#49c774;
-}
-
-.valueFalse{
-    background:#4a7dff;
-}
-
-/* BOTONES RESPUESTA */
+.valueTrue{  background:#49c774; }
+.valueFalse{ background:#4a7dff; }
 
 .answerButtons{
     display:flex;
@@ -279,19 +231,8 @@ td{
     cursor:pointer;
 }
 
-.answerButtons button:first-child{
-    background:#49c774;
-    color:white;
-}
-
-.answerButtons button:last-child{
-    background:#4a7dff;
-    color:white;
-}
-
-
-
-/* FEEDBACK */
+.answerButtons button:first-child{ background:#49c774; color:white; }
+.answerButtons button:last-child{  background:#4a7dff; color:white; }
 
 .feedback{
     margin-top:20px;
@@ -301,17 +242,8 @@ td{
     text-align:center;
 }
 
-.correct{
-    background:#d4f8d4;
-}
-
-.wrong{
-    background:#ffd4d4;
-}
-
-
-
-/* PROGRESO */
+.correct{ background:#d4f8d4; }
+.wrong{   background:#ffd4d4; }
 
 .progress{
     margin-top:20px;
@@ -319,132 +251,308 @@ td{
     text-align:center;
 }
 
-   /* CENTRAR TODOS LOS BOTONES */
-.symbols{
+/* ======================================
+   JUEGO: OPERADOR PRINCIPAL
+   ====================================== */
+
+/* Barra de progreso del juego */
+.gameProgressBar{
     display:flex;
-    justify-content:center;
     align-items:center;
+    justify-content:center;
     flex-wrap:wrap;
-    gap:12px;
-    margin-top:20px;
+    gap:16px;
+    background:#f0f4ff;
+    border-radius:14px;
+    padding:12px 20px;
+    font-size:18px;
+    font-weight:bold;
 }
 
-/* ESTILO GENERAL */
-.symbolBtn{
-    min-width:65px;
-    height:60px;
-    border:none;
-    border-radius:14px;
-    font-size:26px;
-    font-weight:bold;
-    color:white;
+.gpItem{ color:#29527a; }
+.gpScore{ color:#e67e22; }
+.gpStreak{ color:#e74c3c; min-width:60px; }
+.gpLevel{ color:#9b59ff; }
+
+.gpExit{
+    margin-left:auto;
+    background:transparent;
+    border:2px solid #ccc;
+    border-radius:10px;
+    padding:4px 14px;
+    font-size:15px;
+    color:#888;
     cursor:pointer;
     transition:0.2s;
 }
 
-/* HOVER */
-.symbolBtn:hover{
-    transform:translateY(-2px);
-    opacity:0.9;
+.gpExit:hover{ background:#ffd4d4; border-color:#ff6b6b; color:#c0392b; }
+
+/* Tarjeta del desafío */
+.operatorGameCard{
+    margin-top:20px;
+    background:linear-gradient(135deg,#f8f4ff,#eef5ff);
+    border-radius:20px;
+    padding:30px 24px;
+    text-align:center;
+    box-shadow:0 4px 16px rgba(155,89,255,0.12);
 }
 
-/* VARIABLES */
-.variableBtn{
-    background:#4f8cff;
+.ogInstruction{
+    font-size:22px;
+    color:#29527a;
+    margin-bottom:28px;
 }
 
-/* CONECTORES */
-.connectorBtn{
-    background:#9b59ff;
+/* Fórmula con operadores clicables */
+.ogFormula{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:6px;
+    margin-bottom:28px;
 }
 
-/* FILA ACTIVA */
-
-.activeRow{
-    background:#fff6bf !important;
+.gameVar{
+    font-size:42px;
+    font-weight:bold;
+    color:#2c3e50;
+    padding:0 2px;
+    line-height:1;
 }
 
-/* fila activa + dependencias */
-
-td.activeRow.dependencyColumn,
-th.activeRow.dependencyColumn{
-    background:#ffe58f !important;
+.gameParen{
+    font-size:44px;
+    color:#95a5a6;
+    padding:0 1px;
+    line-height:1;
 }
 
-/* fila activa + columna actual */
-
-td.activeRow.currentColumn,
-th.activeRow.currentColumn{
-    background:#ffcccc !important;
+/* Operadores clicables */
+.clickableOp{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-width:56px;
+    height:56px;
+    background:#7c4dff;
+    color:white;
+    border-radius:14px;
+    font-size:30px;
+    font-weight:bold;
+    cursor:pointer;
+    border:3px solid transparent;
+    transition:transform 0.15s, background 0.15s, box-shadow 0.15s;
+    user-select:none;
+    padding:0 8px;
 }
 
-/* dependencias activas */
-
-.activeDependency{
-    background:#ffe58f !important;
-    box-shadow:
-        inset 0 0 0 3px #f5c542;
+.clickableOp:hover{
+    transform:translateY(-4px);
+    background:#5c35cc;
+    box-shadow:0 8px 20px rgba(124,77,255,0.35);
 }
 
-/* resultado actual */
-
-.activeCurrent{
-    background:#ffb3b3 !important;
-    box-shadow:
-        inset 0 0 0 3px #ff6b6b;
+/* Correcto */
+.clickableOp.opCorrect{
+    background:#27ae60;
+    border-color:#1e8449;
+    animation:popIn 0.35s ease;
 }
 
-.deleteBtn{
-    background:#ff9f43;
+/* Incorrecto */
+.clickableOp.opWrong{
+    background:#e74c3c;
+    border-color:#c0392b;
+    animation:shake 0.35s ease;
 }
 
-.deleteBtn:hover{
-    background:#ff7f00;
+@keyframes popIn{
+    0%  { transform:scale(1); }
+    50% { transform:scale(1.25); }
+    100%{ transform:scale(1); }
 }
 
-.clearBtn{
-    background:#ff5c5c;
+@keyframes shake{
+    0%  { transform:translateX(0); }
+    25% { transform:translateX(-6px); }
+    75% { transform:translateX(6px); }
+    100%{ transform:translateX(0); }
 }
 
-.clearBtn:hover{
-    background:#e63939;
+/* Pista */
+.ogHint{
+    font-size:17px;
+    color:#7f8c8d;
+    background:white;
+    border-radius:12px;
+    padding:10px 18px;
+    display:inline-block;
+    box-shadow:0 2px 6px rgba(0,0,0,0.06);
 }
 
-/*======================*/
-/* RESPONSIVE */
-/*======================*/
+/* Feedback */
+.ogFeedback{
+    margin-top:20px;
+    border-radius:16px;
+    padding:22px 24px;
+    font-size:19px;
+}
+
+.ogCorrect{
+    background:#eafaf1;
+    border:2px solid #27ae60;
+}
+
+.ogWrong{
+    background:#fef9f9;
+    border:2px solid #e74c3c;
+}
+
+.ogFeedbackTitle{
+    font-size:24px;
+    font-weight:bold;
+    margin-bottom:10px;
+}
+
+.ogPoints{
+    color:#27ae60;
+    font-size:22px;
+}
+
+.ogStreakMsg{
+    font-size:20px;
+    color:#e67e22;
+    margin-bottom:8px;
+}
+
+.ogExplanation{
+    line-height:1.6;
+    margin-bottom:18px;
+    color:#2c3e50;
+}
+
+.ogNextBtn{
+    background:#4a7dff;
+    color:white;
+    border:none;
+    border-radius:12px;
+    padding:12px 28px;
+    font-size:18px;
+    cursor:pointer;
+    transition:0.2s;
+    margin:4px;
+}
+
+.ogNextBtn:hover{ background:#3565dd; transform:translateY(-2px); }
+
+.ogRetryBtn{
+    background:#f39c12;
+    color:white;
+    border:none;
+    border-radius:12px;
+    padding:12px 28px;
+    font-size:18px;
+    cursor:pointer;
+    transition:0.2s;
+    margin:4px;
+}
+
+.ogRetryBtn:hover{ background:#d68910; transform:translateY(-2px); }
+
+.ogWrongBtns{
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+    justify-content:center;
+    margin-top:4px;
+}
+
+/* Pantalla final */
+.ogEndCard{
+    margin-top:20px;
+    background:linear-gradient(135deg,#fff9f0,#f0f8ff);
+    border-radius:24px;
+    padding:40px 24px;
+    text-align:center;
+    box-shadow:0 6px 24px rgba(0,0,0,0.1);
+}
+
+.ogEndMedal{ font-size:72px; margin-bottom:10px; }
+
+.ogEndTitle{
+    font-size:32px;
+    color:#29527a;
+    margin:0 0 8px;
+}
+
+.ogEndMsg{
+    font-size:20px;
+    color:#555;
+    margin-bottom:28px;
+}
+
+.ogEndStats{
+    display:flex;
+    justify-content:center;
+    gap:30px;
+    flex-wrap:wrap;
+    margin-bottom:32px;
+}
+
+.ogStat{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    background:white;
+    border-radius:16px;
+    padding:16px 28px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.08);
+    min-width:100px;
+}
+
+.ogStatVal{
+    font-size:32px;
+    font-weight:bold;
+    color:#29527a;
+}
+
+.ogStatLabel{
+    font-size:15px;
+    color:#888;
+    margin-top:4px;
+}
+
+.ogEndBtns{
+    display:flex;
+    gap:14px;
+    justify-content:center;
+    flex-wrap:wrap;
+}
+
+/* ======================================
+   RESPONSIVE
+   ====================================== */
 @media(max-width:700px){
 
-    body{
-        padding:10px;
-    }
+    body{ padding:10px; }
+    .container{ padding:15px; }
+    table{ font-size:15px; }
+    textarea{ font-size:20px; }
 
-    .container{
-        padding:15px;
-    }
+    .instructions-image img{ width:95%; }
+    .question{ font-size:20px; }
+    .variableBox{ font-size:22px; }
+    .answerButtons{ flex-direction:column; }
 
-    table{
-        font-size:15px;
-    }
+    .ogFormula{ gap:4px; }
+    .gameVar{ font-size:34px; }
+    .gameParen{ font-size:36px; }
+    .clickableOp{ font-size:26px; min-width:48px; height:48px; }
 
-    textarea{
-        font-size:20px;
-    }
+    .ogEndStats{ gap:16px; }
+    .ogStat{ padding:12px 18px; min-width:80px; }
+    .ogStatVal{ font-size:26px; }
 
-    .instructions-image img{
-        width:95%;
-    }
-
-    .question{
-        font-size:20px;
-    }
-
-    .variableBox{
-        font-size:22px;
-    }
-
-    .answerButtons{
-        flex-direction:column;
-    }
-  
 }

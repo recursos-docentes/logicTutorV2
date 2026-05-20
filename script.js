@@ -76,8 +76,6 @@ function normalizeFormula(expr){
 
     }
 
-    // volver a poner paréntesis
-    // SOLO si tiene operador principal
     let balance = 0;
 
     for(let i=0; i<expr.length; i++){
@@ -108,10 +106,6 @@ function normalizeFormula(expr){
 function getDirectDependencies(expr){
 
     expr = expr.trim();
-
-    // =========================
-    // QUITAR PARÉNTESIS EXTERNOS
-    // =========================
 
     while(
         expr.startsWith("(") &&
@@ -148,16 +142,11 @@ function getDirectDependencies(expr){
 
     }
 
-    // =========================
-    // NEGACIÓN PURA
-    // =========================
-
     if(expr.startsWith("¬")){
 
         let inner =
             expr.slice(1).trim();
 
-        // verificar si realmente es una negación pura
         let balance = 0;
         let hasMainOperator = false;
 
@@ -188,10 +177,6 @@ function getDirectDependencies(expr){
         }
 
     }
-
-    // =========================
-    // OPERADORES PRINCIPALES
-    // =========================
 
     let operators =
         ["↔","→","∨","∧"];
@@ -254,10 +239,6 @@ function extractSubformulas(expr){
 
         expression = expression.trim();
 
-        // =========================
-        // QUITAR PARÉNTESIS EXTERNOS
-        // =========================
-
         while(
             expression.startsWith("(") &&
             expression.endsWith(")")
@@ -293,19 +274,11 @@ function extractSubformulas(expr){
 
         }
 
-        // =========================
-        // VARIABLE SIMPLE
-        // =========================
-
         if(/^[a-z]$/i.test(expression)){
 
             return;
 
         }
-
-        // =========================
-        // NEGACIÓN PURA
-        // =========================
 
         if(expression.startsWith("¬")){
 
@@ -348,10 +321,6 @@ function extractSubformulas(expr){
             }
 
         }
-
-        // =========================
-        // OPERADORES
-        // =========================
 
         let operators =
             ["↔","→","∨","∧"];
@@ -418,10 +387,6 @@ function solveSubformula(expr, values){
 
     expr = expr.trim();
 
-    // =========================
-    // QUITAR PARÉNTESIS EXTERNOS
-    // =========================
-
     while(
         expr.startsWith("(") &&
         expr.endsWith(")")
@@ -457,19 +422,11 @@ function solveSubformula(expr, values){
 
     }
 
-    // =========================
-    // VARIABLE
-    // =========================
-
     if(/^[a-z]$/i.test(expr)){
 
         return values[expr];
 
     }
-
-    // =========================
-    // NEGACIÓN PURA
-    // =========================
 
     if(expr.startsWith("¬")){
 
@@ -507,10 +464,6 @@ function solveSubformula(expr, values){
         }
 
     }
-
-    // =========================
-    // OPERADORES
-    // =========================
 
     let operators =
         ["↔","→","∨","∧"];
@@ -576,6 +529,7 @@ function solveSubformula(expr, values){
     return false;
 
 }
+
 // =========================
 // VALIDAR FÓRMULA
 // =========================
@@ -584,109 +538,60 @@ function isValidFormula(expr){
 
     expr = expr.replace(/\s/g,"");
 
-    // caracteres permitidos
     const validChars =
-     /^[pqrs∧∨¬→↔()]+$/i;
-   // Si la cadena está vacía o contiene paréntesis vacíos, rechazar
-    if(expr === "" || /\(\s*\)/.test(expr)) {
+        /^[pqrs∧∨¬→↔()]+$/i;
+
+    if(expr === "" || /\(\s*\)/.test(expr)){
         return false;
     }
+
     if(!validChars.test(expr)){
-
         return false;
-
     }
 
-    // no puede terminar u empezar mal
     if(
         /^[∧∨→↔]/.test(expr) ||
         /[∧∨¬→↔]$/.test(expr)
     ){
-
         return false;
-
     }
 
-    // variables pegadas
-    if(
-        /[a-z][a-z]/i.test(expr)
-    ){
-
+    if(/[a-z][a-z]/i.test(expr)){
         return false;
-
-    }
-    // variable seguida de variable o negación
-if(
-    /[a-z](?:[a-z]|¬|\()/i.test(expr)
-){
-
-    return false;
-
-}
-
-    // operadores repetidos
-    if(
-        /[∧∨→↔]{2,}/.test(expr)
-    ){
-
-        return false;
-
-    }
-        // variable seguida de negación
-    if(
-       /[a-z]¬/i.test(expr)
-    ){
-
-        return false;
-
     }
 
-    // variable seguida de (
-    if(
-        /[a-z]\(/i.test(expr)
-    ){
-
+    if(/[a-z](?:[a-z]|¬|\()/i.test(expr)){
         return false;
-
     }
 
-    // ) seguida de variable
-    if(
-        /\)[a-z]/i.test(expr)
-    ){
-
+    if(/[∧∨→↔]{2,}/.test(expr)){
         return false;
-
     }
 
-    // ) seguida de ¬
-    if(
-        /\)¬/.test(expr)
-    ){
-
+    if(/[a-z]¬/i.test(expr)){
         return false;
-
     }
 
-    // operador seguido de )
-    if(
-        /[∧∨→↔]\)/.test(expr)
-    ){
-
+    if(/[a-z]\(/i.test(expr)){
         return false;
-
     }
 
-    // ( seguido de operador binario
-    if(
-        /\([∧∨→↔]/.test(expr)
-    ){
-
+    if(/\)[a-z]/i.test(expr)){
         return false;
-
     }
 
-    // paréntesis balanceados
+    if(/\)¬/.test(expr)){
+        return false;
+    }
+
+    if(/[∧∨→↔]\)/.test(expr)){
+        return false;
+    }
+
+    if(/\([∧∨→↔]/.test(expr)){
+        return false;
+    }
+
     let balance = 0;
 
     for(let char of expr){
@@ -695,17 +600,13 @@ if(
         if(char === ")") balance--;
 
         if(balance < 0){
-
             return false;
-
         }
 
     }
 
     if(balance !== 0){
-
         return false;
-
     }
 
     return true;
@@ -719,9 +620,12 @@ if(
 // =========================
 
 function startGuidedMode(){
+
+    if(operatorGame.active) exitOperatorGame();
+
     mistakes = 0;
     currentRowInColumn = 0;
-    
+
     const formula =
         document.getElementById("formula")
         .value
@@ -729,15 +633,10 @@ function startGuidedMode(){
 
     if(formula === "") return;
 
-if(!isValidFormula(formula)){
-
-    alert(
-        "La fórmula lógica no es válida"
-    );
-
-    return;
-
-}
+    if(!isValidFormula(formula)){
+        alert("La fórmula lógica no es válida");
+        return;
+    }
 
     const vars =
         getVariables(formula);
@@ -783,10 +682,7 @@ if(!isValidFormula(formula)){
     currentColumn =
         vars.length;
 
-    
-
     renderGuidedTable();
-
     showColumnQuestion();
 
 }
@@ -801,78 +697,49 @@ function renderGuidedTable(){
 
     let currentFormula = "";
 
-    // evitar error al terminar
     if(
         currentColumn <
         guidedTable.columns.length
     ){
-
         currentFormula =
             guidedTable.columns[currentColumn];
-
     }
 
     let dependencies = [];
 
     if(currentFormula !== ""){
-
         dependencies =
             getDirectDependencies(
                 currentFormula
             );
-
     }
 
     let html = "<table><tr>";
-
-
-
-    // =========================
-    // CABECERAS
-    // =========================
 
     guidedTable.columns.forEach((col,index)=>{
 
         let className = "";
 
-        // columnas necesarias
-      if(
-    dependencies.some(
-        dep =>
-            normalizeFormula(dep)
-            ===
-            normalizeFormula(col)
-    )
-){
-
-            className +=
-                " dependencyColumn";
-
+        if(
+            dependencies.some(
+                dep =>
+                    normalizeFormula(dep)
+                    ===
+                    normalizeFormula(col)
+            )
+        ){
+            className += " dependencyColumn";
         }
 
-        // columna actual
         if(index === currentColumn){
-
-            className +=
-                " currentColumn";
-
+            className += " currentColumn";
         }
 
-        html += `
-        <th class="${className}">
-            ${col}
-        </th>
-        `;
+        html += `<th class="${className}">${col}</th>`;
 
     });
 
     html += "</tr>";
-
-
-
-    // =========================
-    // FILAS
-    // =========================
 
     guidedTable.rows.forEach((row,rowIndex)=>{
 
@@ -882,75 +749,41 @@ function renderGuidedTable(){
 
             let className = "";
 
-            // dependencias
-          if(
-    dependencies.some(
-        dep =>
-            normalizeFormula(dep)
-            ===
-            normalizeFormula(col)
-    )
-){
-
-                className +=
-                    " dependencyColumn";
-
-            }
-
-            // columna actual
-            if(index === currentColumn){
-
-                className +=
-                    " currentColumn";
-
-            }
-
-            // =========================
-            // SOLO CELDAS ACTIVAS
-            // =========================
-
             if(
-                rowIndex === currentRowInColumn
+                dependencies.some(
+                    dep =>
+                        normalizeFormula(dep)
+                        ===
+                        normalizeFormula(col)
+                )
             ){
+                className += " dependencyColumn";
+            }
 
-                // columnas usadas
-                if(
-                    dependencies.includes(col)
-                ){
+            if(index === currentColumn){
+                className += " currentColumn";
+            }
 
-                    className +=
-                        " activeDependency";
+            if(rowIndex === currentRowInColumn){
 
+                if(dependencies.includes(col)){
+                    className += " activeDependency";
                 }
 
-                // resultado actual
-                if(
-                    index === currentColumn
-                ){
-
-                    className +=
-                        " activeCurrent";
-
+                if(index === currentColumn){
+                    className += " activeCurrent";
                 }
 
             }
 
             let value = row[col];
-
             let text = "?";
 
             if(value !== undefined){
-
-                text =
-                    value ? "V":"F";
-
+                text = value ? "V" : "F";
             }
 
-            html += `
-            <td class="${className}">
-                ${text}
-            </td>
-            `;
+            html += `<td class="${className}">${text}</td>`;
 
         });
 
@@ -960,16 +793,11 @@ function renderGuidedTable(){
 
     html += "</table>";
 
-
-
     document.getElementById(
         "tableContainer"
     ).innerHTML = html;
 
 }
-// =========================
-// MOSTRAR PREGUNTA
-// =========================
 
 // =========================
 // MOSTRAR PREGUNTA
@@ -984,14 +812,12 @@ function showColumnQuestion(){
 
     let dependencies = getDirectDependencies(formula);
 
-    // Actualizar progreso
     document.getElementById("progress").innerHTML = `
         Resolviendo columna: <b>${formula}</b><br>
         Fila ${currentRowInColumn + 1} de ${guidedTable.rows.length}<br><br>
         ❌ Errores: <b>${mistakes}</b>
     `;
 
-    // Actualizar área de pregunta
     document.getElementById("questionArea").innerHTML = `
         <div class="question">
             <h3>${formula}</h3>
@@ -1005,7 +831,6 @@ function showColumnQuestion(){
                     </div>
                 `).join("")}
             </div>
-
             <div class="answerButtons">
                 <button type="button" onclick="checkColumnAnswer(true); return false;">
                     🟩 Verdadero
@@ -1016,7 +841,9 @@ function showColumnQuestion(){
             </div>
         </div>
     `;
+
 }
+
 // =========================
 // VALIDAR RESPUESTA
 // =========================
@@ -1024,48 +851,29 @@ function showColumnQuestion(){
 function checkColumnAnswer(answer){
 
     let feedback =
-        document.getElementById(
-            "feedback"
-        );
-
-    // =========================
-    // RESPUESTA CORRECTA
-    // =========================
+        document.getElementById("feedback");
 
     if(answer === currentAnswer){
 
-        // limpiar feedback
         feedback.innerHTML = "";
 
-        // fórmula actual
         let formula =
             guidedTable.columns[currentColumn];
 
-        // guardar resultado
         guidedTable.rows[currentRowInColumn][formula]
             = answer;
 
-        // redibujar tabla
         renderGuidedTable();
 
-        // avanzar fila
         currentRowInColumn++;
 
-        // terminó columna
         if(
             currentRowInColumn >=
             guidedTable.rows.length
         ){
-
             currentRowInColumn = 0;
-
             currentColumn++;
-
         }
-
-        // =========================
-        // TERMINÓ TODA LA TABLA
-        // =========================
 
         if(
             currentColumn >=
@@ -1083,21 +891,13 @@ function checkColumnAnswer(answer){
             document.getElementById(
                 "questionArea"
             ).innerHTML = `
-
             <div class="step">
-
                 🎉 ¡Tabla completada!
-
                 <br><br>
-
-                ❌ Errores cometidos:
-                <b>${mistakes}</b>
-
+                ❌ Errores cometidos: <b>${mistakes}</b>
             </div>
-
             `;
 
-            // limpiar textarea
             document.getElementById(
                 "formula"
             ).value = "";
@@ -1106,59 +906,34 @@ function checkColumnAnswer(answer){
 
         }
 
-        // actualizar siguiente pregunta
         renderGuidedTable();
-
         showColumnQuestion();
 
-    }
-
-    // =========================
-    // RESPUESTA INCORRECTA
-    // =========================
-
-    else{
+    } else {
 
         mistakes++;
 
-        // actualizar progreso
         let formula =
             guidedTable.columns[currentColumn];
 
         document.getElementById(
             "progress"
         ).innerHTML = `
-
-        Resolviendo columna:
-        <b>${formula}</b>
-
-        <br>
-
-        Fila
-        ${currentRowInColumn + 1}
-        de
-        ${guidedTable.rows.length}
-
-        <br><br>
-
-        ❌ Errores:
-        <b>${mistakes}</b>
-
+            Resolviendo columna: <b>${formula}</b><br>
+            Fila ${currentRowInColumn + 1} de ${guidedTable.rows.length}<br><br>
+            ❌ Errores: <b>${mistakes}</b>
         `;
 
         feedback.innerHTML = `
-
         <div class="feedback wrong">
-
             ❌ Intenta nuevamente
-
         </div>
-
         `;
 
     }
 
 }
+
 function deleteLastSymbol(){
 
     const textarea =
@@ -1168,8 +943,6 @@ function deleteLastSymbol(){
         textarea.value.slice(0,-1);
 
 }
-
-
 
 function clearFormula(){
 
@@ -1181,8 +954,422 @@ function clearFormula(){
 
 
 
-// DEBUG
+// =====================================================
+// JUEGO: OPERADOR PRINCIPAL
+// =====================================================
 
-console.log(
-    "Logic Tutor cargado correctamente"
-);
+const OPERATOR_GAME_CHALLENGES = [
+    // Nivel 1 — básico
+    { formula: "p∧q",          hint: "Solo hay un operador. ¿Cuál es?", level: 1 },
+    { formula: "p∨q",          hint: "Solo hay un operador binario.", level: 1 },
+    { formula: "p→q",          hint: "Solo hay un operador binario.", level: 1 },
+    { formula: "¬p",           hint: "Solo hay un operador.", level: 1 },
+    { formula: "p↔q",          hint: "Solo hay un operador binario.", level: 1 },
+    // Nivel 2 — paréntesis simples
+    { formula: "¬(p∧q)",       hint: "¿La ¬ afecta solo a p, o a toda la expresión entre paréntesis?", level: 2 },
+    { formula: "(p∨q)∧r",      hint: "¿Qué operador conecta los dos grupos principales?", level: 2 },
+    { formula: "p→(q∨r)",      hint: "¿El → está dentro o fuera del paréntesis?", level: 2 },
+    { formula: "¬p∨q",         hint: "¿La ¬ afecta solo a p, o a toda la fórmula?", level: 2 },
+    { formula: "(p→q)↔r",      hint: "¿Qué operador está fuera del paréntesis?", level: 2 },
+    // Nivel 3 — avanzado
+    { formula: "¬(p→q)",       hint: "¿La ¬ actúa sobre toda la implicación?", level: 3 },
+    { formula: "(p∧q)→(r∨s)",  hint: "Hay operadores en ambos grupos. ¿Cuál conecta todo?", level: 3 },
+    { formula: "¬p∧¬q",        hint: "Hay dos negaciones. ¿Cuál es el operador principal?", level: 3 },
+    { formula: "(p↔q)∧¬r",     hint: "Hay un ∧ y una ¬. ¿Cuál conecta las dos partes?", level: 3 },
+    { formula: "¬(p∨q)→r",     hint: "¿El → o la ¬ es el operador principal?", level: 3 },
+    { formula: "(p∧¬q)∨r",     hint: "¿El ∨ está dentro o fuera del paréntesis?", level: 3 },
+];
+
+let operatorGame = {
+    active: false,
+    questions: [],
+    currentIndex: 0,
+    score: 0,
+    streak: 0,
+    maxStreak: 0,
+    answered: false,
+    correctPos: -1,
+    currentFormula: ""
+};
+
+// ---------------------------
+// Utilidades del juego
+// ---------------------------
+
+function shuffleArray(arr){
+    let a = [...arr];
+    for(let i = a.length - 1; i > 0; i--){
+        let j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+
+// Devuelve el índice (en la cadena original) del operador principal.
+function findMainOperatorPosition(formula){
+
+    // Encontrar el rango sin paréntesis externos
+    let start = 0;
+    let end = formula.length;
+
+    while(start < end){
+        if(formula[start] !== "(" || formula[end - 1] !== ")") break;
+        let balance = 0;
+        let valid = true;
+        for(let i = start; i < end - 1; i++){
+            if(formula[i] === "(") balance++;
+            if(formula[i] === ")") balance--;
+            if(balance === 0){ valid = false; break; }
+        }
+        if(valid){ start++; end--; }
+        else break;
+    }
+
+    let sub = formula.slice(start, end);
+
+    // Caso negación pura
+    if(sub.startsWith("¬")){
+        let inner = sub.slice(1);
+        let balance = 0;
+        let hasBinary = false;
+        for(let i = 0; i < inner.length; i++){
+            if(inner[i] === "(") balance++;
+            if(inner[i] === ")") balance--;
+            if(balance === 0 && ["∧","∨","→","↔"].includes(inner[i])){
+                hasBinary = true;
+                break;
+            }
+        }
+        if(!hasBinary) return start; // ¬ es el principal
+    }
+
+    // Buscar operador binario de menor precedencia
+    const ops = ["↔","→","∨","∧"];
+    for(let op of ops){
+        let balance = 0;
+        for(let i = sub.length - 1; i >= 0; i--){
+            if(sub[i] === ")") balance++;
+            if(sub[i] === "(") balance--;
+            if(balance === 0 && sub[i] === op) return start + i;
+        }
+    }
+
+    return -1;
+}
+
+// Calcula la profundidad de paréntesis en la posición `pos`.
+function getDepthAtPosition(formula, pos){
+    let depth = 0;
+    for(let i = 0; i < pos; i++){
+        if(formula[i] === "(") depth++;
+        if(formula[i] === ")") depth--;
+    }
+    return depth;
+}
+
+// Genera la explicación cuando el alumno se equivoca.
+function generateWrongExplanation(formula, selectedPos, correctPos){
+    let selectedOp = formula[selectedPos];
+    let correctOp  = formula[correctPos];
+    let depth = getDepthAtPosition(formula, selectedPos);
+
+    // El operador elegido está dentro de paréntesis
+    if(depth > 0){
+        if(correctOp === "¬"){
+            return `El operador <b>${selectedOp}</b> está dentro de paréntesis y se resuelve antes.
+                    La <b>¬</b> está fuera y afecta a toda la expresión <b>${formula.slice(correctPos + 1)}</b>,
+                    por eso es el operador principal: se evalúa al <b>último</b>.`;
+        }
+        return `El operador <b>${selectedOp}</b> está dentro de paréntesis, por lo que se resuelve
+                <b>antes</b> que el operador principal.
+                El operador principal es <b>${correctOp}</b>, que está fuera de los paréntesis
+                y conecta las dos partes más grandes de la fórmula.`;
+    }
+
+    // Eligió ¬ pero el principal es binario
+    if(selectedOp === "¬"){
+        let after = formula[selectedPos + 1] === "("
+            ? "la subfórmula entre paréntesis"
+            : `<b>${formula[selectedPos + 1]}</b>`;
+        return `La negación <b>¬</b> tiene alta precedencia y solo afecta a ${after},
+                no a toda la fórmula.
+                El operador principal es <b>${correctOp}</b>,
+                que conecta las dos partes más grandes de la expresión.`;
+    }
+
+    // El principal es ¬ pero eligió un binario
+    if(correctOp === "¬"){
+        return `¡Cuidado! La <b>¬</b> está fuera del paréntesis y afecta a toda la expresión
+                <b>${formula.slice(correctPos + 1)}</b>.
+                Eso significa que se evalúa al <b>último</b>, por eso es el operador principal.
+                El <b>${selectedOp}</b> está dentro del paréntesis y se resuelve antes.`;
+    }
+
+    // Ambos binarios al mismo nivel, diferente precedencia
+    const precOrder = { "∧": 0, "∨": 1, "→": 2, "↔": 3 };
+    if(precOrder[selectedOp] < precOrder[correctOp]){
+        return `El operador <b>${selectedOp}</b> tiene mayor precedencia que <b>${correctOp}</b>,
+                así que se resuelve antes.
+                El operador principal es el de <b>menor</b> precedencia: <b>${correctOp}</b>.<br>
+                <small>Orden de precedencia (mayor → menor): ¬ &gt; ∧ &gt; ∨ &gt; → &gt; ↔</small>`;
+    }
+
+    return `El operador principal es <b>${correctOp}</b>.
+            Recordá: es el que se evalúa al final, el de menor precedencia
+            fuera de todos los paréntesis.`;
+}
+
+// Genera refuerzo positivo cuando la respuesta es correcta.
+function generateCorrectExplanation(formula, correctPos){
+    let op = formula[correctPos];
+    let depth = getDepthAtPosition(formula, correctPos);
+    const names = {
+        "∧": "conjunción",
+        "∨": "disyunción",
+        "→": "implicación",
+        "↔": "bicondicional"
+    };
+
+    if(op === "¬"){
+        return `La <b>¬</b> está fuera del paréntesis y afecta a toda la expresión
+                <b>${formula.slice(correctPos + 1)}</b>. Se evalúa al último.`;
+    }
+
+    if(depth === 0){
+        return `La <b>${op}</b> (${names[op] || ""}) está al nivel más externo
+                y conecta las dos partes principales de la fórmula. Se evalúa al final.`;
+    }
+
+    return `El operador <b>${op}</b> está fuera de todos los paréntesis: es el operador principal.`;
+}
+
+// Construye el HTML de la fórmula con operadores clicables.
+function renderClickableFormula(formula){
+    const OPS = ["∧","∨","¬","→","↔"];
+    let html = "";
+    for(let i = 0; i < formula.length; i++){
+        let ch = formula[i];
+        if(OPS.includes(ch)){
+            html += `<span class="clickableOp" data-pos="${i}"
+                          onclick="checkOperatorAnswer(${i})">${ch}</span>`;
+        } else if(ch === "(" || ch === ")"){
+            html += `<span class="gameParen">${ch}</span>`;
+        } else {
+            html += `<span class="gameVar">${ch}</span>`;
+        }
+    }
+    return html;
+}
+
+// ---------------------------
+// Flujo del juego
+// ---------------------------
+
+function startOperatorGame(){
+
+    // Construir pool de preguntas
+    let pool = [...OPERATOR_GAME_CHALLENGES];
+
+    // Incluir la fórmula del textarea si es válida
+    let userFormula = document.getElementById("formula").value.trim();
+    if(
+        userFormula &&
+        isValidFormula(userFormula) &&
+        !/^[a-z]$/i.test(userFormula) &&
+        !pool.some(q => q.formula === userFormula)
+    ){
+        pool.push({ formula: userFormula, hint: "¡Esta es tu propia fórmula!", level: 2 });
+    }
+
+    operatorGame.active    = true;
+    operatorGame.questions = shuffleArray(pool);
+    operatorGame.currentIndex = 0;
+    operatorGame.score     = 0;
+    operatorGame.streak    = 0;
+    operatorGame.maxStreak = 0;
+    operatorGame.answered  = false;
+
+    clearMainAreas();
+    renderOperatorGameChallenge();
+}
+
+function clearMainAreas(){
+    document.getElementById("progress").innerHTML      = "";
+    document.getElementById("questionArea").innerHTML  = "";
+    document.getElementById("feedback").innerHTML      = "";
+    document.getElementById("tableContainer").innerHTML = "";
+}
+
+function renderOperatorGameProgress(){
+    let q     = operatorGame.questions;
+    let idx   = operatorGame.currentIndex;
+    let total = q.length;
+    let level = idx < total ? (q[idx].level || "?") : "";
+
+    document.getElementById("progress").innerHTML = `
+        <div class="gameProgressBar">
+            <span class="gpItem">📋 ${idx + 1} / ${total}</span>
+            <span class="gpItem gpScore">⭐ ${operatorGame.score} pts</span>
+            <span class="gpItem gpStreak">${operatorGame.streak >= 2 ? "🔥 ×" + operatorGame.streak : ""}</span>
+            <span class="gpItem gpLevel">Nivel ${level}</span>
+            <button class="gpExit" onclick="exitOperatorGame()">✕ Salir</button>
+        </div>
+    `;
+}
+
+function renderOperatorGameChallenge(){
+
+    if(operatorGame.currentIndex >= operatorGame.questions.length){
+        showOperatorGameEnd();
+        return;
+    }
+
+    let q = operatorGame.questions[operatorGame.currentIndex];
+    operatorGame.currentFormula = q.formula;
+    operatorGame.correctPos     = findMainOperatorPosition(q.formula);
+    operatorGame.answered       = false;
+
+    renderOperatorGameProgress();
+
+    document.getElementById("questionArea").innerHTML = `
+        <div class="operatorGameCard">
+            <div class="ogInstruction">
+                Tocá el <b>operador principal</b> de la fórmula:
+            </div>
+            <div class="ogFormula" id="ogFormula">
+                ${renderClickableFormula(q.formula)}
+            </div>
+            <div class="ogHint">💡 ${q.hint}</div>
+        </div>
+    `;
+
+    document.getElementById("feedback").innerHTML = "";
+}
+
+function checkOperatorAnswer(pos){
+
+    if(operatorGame.answered) return;
+    operatorGame.answered = true;
+
+    let formula    = operatorGame.currentFormula;
+    let correctPos = operatorGame.correctPos;
+    let isCorrect  = (pos === correctPos);
+
+    // Marcar visualmente los operadores
+    document.querySelectorAll("#ogFormula .clickableOp").forEach(span => {
+        let sp = parseInt(span.getAttribute("data-pos"));
+        span.style.pointerEvents = "none";
+        if(sp === correctPos) span.classList.add("opCorrect");
+        if(sp === pos && !isCorrect) span.classList.add("opWrong");
+    });
+
+    if(isCorrect){
+
+        operatorGame.streak++;
+        if(operatorGame.streak > operatorGame.maxStreak)
+            operatorGame.maxStreak = operatorGame.streak;
+
+        // Bonus por racha: +2 pts cada 3 correctas seguidas
+        let bonus  = Math.floor(operatorGame.streak / 3) * 2;
+        let points = 10 + bonus;
+        operatorGame.score += points;
+
+        let explanation = generateCorrectExplanation(formula, correctPos);
+        let streakMsg   = operatorGame.streak >= 3
+            ? `<div class="ogStreakMsg">🔥 ¡Racha de ${operatorGame.streak}! +${bonus} extra</div>`
+            : "";
+
+        document.getElementById("feedback").innerHTML = `
+            <div class="ogFeedback ogCorrect">
+                <div class="ogFeedbackTitle">✅ ¡Correcto! <span class="ogPoints">+${points} pts</span></div>
+                ${streakMsg}
+                <div class="ogExplanation">${explanation}</div>
+                <button class="ogNextBtn" onclick="nextOperatorChallenge()">Siguiente →</button>
+            </div>
+        `;
+
+    } else {
+
+        operatorGame.streak = 0;
+        let explanation = generateWrongExplanation(formula, pos, correctPos);
+
+        document.getElementById("feedback").innerHTML = `
+            <div class="ogFeedback ogWrong">
+                <div class="ogFeedbackTitle">❌ ¡Cuidado!</div>
+                <div class="ogExplanation">${explanation}</div>
+                <div class="ogWrongBtns">
+                    <button class="ogRetryBtn" onclick="retryOperatorChallenge()">↩ Reintentar</button>
+                    <button class="ogNextBtn"  onclick="nextOperatorChallenge()">Siguiente →</button>
+                </div>
+            </div>
+        `;
+
+    }
+
+    renderOperatorGameProgress();
+}
+
+function retryOperatorChallenge(){
+    renderOperatorGameChallenge();
+}
+
+function nextOperatorChallenge(){
+    operatorGame.currentIndex++;
+    renderOperatorGameChallenge();
+}
+
+function showOperatorGameEnd(){
+
+    let total   = operatorGame.questions.length;
+    let maxPts  = total * 10;
+    let pct     = Math.round((operatorGame.score / maxPts) * 100);
+
+    let medal = pct >= 90 ? "🥇" : pct >= 70 ? "🥈" : pct >= 50 ? "🥉" : "💪";
+    let msg   = pct >= 90
+        ? "¡Dominas el operador principal!"
+        : pct >= 70
+        ? "¡Muy bien! Seguí practicando."
+        : pct >= 50
+        ? "Vas por buen camino."
+        : "La práctica hace al maestro.";
+
+    document.getElementById("progress").innerHTML = "";
+
+    document.getElementById("questionArea").innerHTML = `
+        <div class="ogEndCard">
+            <div class="ogEndMedal">${medal}</div>
+            <h2 class="ogEndTitle">¡Juego terminado!</h2>
+            <p class="ogEndMsg">${msg}</p>
+            <div class="ogEndStats">
+                <div class="ogStat">
+                    <span class="ogStatVal">⭐ ${operatorGame.score}</span>
+                    <span class="ogStatLabel">puntos</span>
+                </div>
+                <div class="ogStat">
+                    <span class="ogStatVal">${total}</span>
+                    <span class="ogStatLabel">preguntas</span>
+                </div>
+                <div class="ogStat">
+                    <span class="ogStatVal">🔥 ${operatorGame.maxStreak}</span>
+                    <span class="ogStatLabel">racha máx.</span>
+                </div>
+            </div>
+            <div class="ogEndBtns">
+                <button class="ogNextBtn"  onclick="startOperatorGame()">🔄 Jugar de nuevo</button>
+                <button class="ogRetryBtn" onclick="exitOperatorGame()">↩ Volver</button>
+            </div>
+        </div>
+    `;
+
+    document.getElementById("feedback").innerHTML = "";
+}
+
+function exitOperatorGame(){
+    operatorGame.active = false;
+    clearMainAreas();
+}
+
+
+
+// DEBUG
+console.log("Logic Tutor cargado correctamente");
