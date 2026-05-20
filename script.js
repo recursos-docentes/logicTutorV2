@@ -4,6 +4,11 @@ let currentColumn = 0;
 let currentRowInColumn = 0;
 let currentAnswer = false;
 let mistakes = 0;
+let guidedScore = 0;
+let guidedStreak = 0;
+let guidedMaxStreak = 0;
+let guidedFreeMode = false;
+let freeCellSelected = false;
 
 
 
@@ -624,6 +629,11 @@ function startGuidedMode(){
     if(operatorGame.active) exitOperatorGame();
 
     mistakes = 0;
+    guidedScore = 0;
+    guidedStreak = 0;
+    guidedMaxStreak = 0;
+    guidedFreeMode = false;
+    freeCellSelected = false;
     currentRowInColumn = 0;
 
     const formula =
@@ -696,106 +706,89 @@ function startGuidedMode(){
 function renderGuidedTable(){
 
     let currentFormula = "";
+    let dependencies   = [];
 
-    if(
-        currentColumn <
-        guidedTable.columns.length
-    ){
-        currentFormula =
-            guidedTable.columns[currentColumn];
+    if(currentColumn >= 0 && currentColumn < guidedTable.columns.length){
+        currentFormula = guidedTable.columns[currentColumn];
     }
 
-    let dependencies = [];
-
-    if(currentFormula !== ""){
-        dependencies =
-            getDirectDependencies(
-                currentFormula
-            );
+    if(currentFormula !== "" && !guidedFreeMode){
+        dependencies = getDirectDependencies(currentFormula);
     }
 
     let html = "<table><tr>";
 
-    guidedTable.columns.forEach((col,index)=>{
-
+    guidedTable.columns.forEach((col, index) => {
         let className = "";
 
-        if(
-            dependencies.some(
-                dep =>
-                    normalizeFormula(dep)
-                    ===
-                    normalizeFormula(col)
-            )
-        ){
-            className += " dependencyColumn";
-        }
-
-        if(index === currentColumn){
-            className += " currentColumn";
+        if(!guidedFreeMode){
+            if(dependencies.some(dep => normalizeFormula(dep) === normalizeFormula(col))){
+                className += " dependencyColumn";
+            }
+            if(index === currentColumn) className += " currentColumn";
         }
 
         html += `<th class="${className}">${col}</th>`;
-
     });
 
     html += "</tr>";
 
-    guidedTable.rows.forEach((row,rowIndex)=>{
+    guidedTable.rows.forEach((row, rowIndex) => {
 
         html += "<tr>";
 
-        guidedTable.columns.forEach((col,index)=>{
+        guidedTable.columns.forEach((col, colIndex) => {
 
+            let value     = row[col];
             let className = "";
+            let text      = "";
+            let extra     = "";
 
-            if(
-                dependencies.some(
-                    dep =>
-                        normalizeFormula(dep)
-                        ===
-                        normalizeFormula(col)
-                )
-            ){
-                className += " dependencyColumn";
-            }
+            if(guidedFreeMode){
 
-            if(index === currentColumn){
-                className += " currentColumn";
-            }
-
-            if(rowIndex === currentRowInColumn){
-
-                if(dependencies.includes(col)){
-                    className += " activeDependency";
-                }
-
-                if(index === currentColumn){
+                // Celda actualmente seleccionada
+                if(freeCellSelected && colIndex === currentColumn && rowIndex === currentRowInColumn){
                     className += " activeCurrent";
                 }
 
+                if(value !== undefined){
+                    text       = value ? "V" : "F";
+                    className += value ? " cellTrue" : " cellFalse";
+                } else if(colIndex < guidedTable.vars.length){
+                    text = "?";
+                } else if(isCellReady(colIndex, rowIndex)){
+                    text       = "?";
+                    className += " freeCell";
+                    extra      = `onclick="selectFreeCell(${colIndex},${rowIndex})"`;
+                } else {
+                    text       = "🔒";
+                    className += " lockedCell";
+                }
+
+            } else {
+
+                if(dependencies.some(dep => normalizeFormula(dep) === normalizeFormula(col))){
+                    className += " dependencyColumn";
+                }
+                if(colIndex === currentColumn) className += " currentColumn";
+
+                if(rowIndex === currentRowInColumn){
+                    if(dependencies.includes(col))    className += " activeDependency";
+                    if(colIndex === currentColumn)     className += " activeCurrent";
+                }
+
+                text = value !== undefined ? (value ? "V" : "F") : "?";
             }
 
-            let value = row[col];
-            let text = "?";
-
-            if(value !== undefined){
-                text = value ? "V" : "F";
-            }
-
-            html += `<td class="${className}">${text}</td>`;
-
+            html += `<td class="${className}" ${extra}>${text}</td>`;
         });
 
         html += "</tr>";
-
     });
 
     html += "</table>";
 
-    document.getElementById(
-        "tableContainer"
-    ).innerHTML = html;
+    document.getElementById("tableContainer").innerHTML = html;
 
 }
 
@@ -812,11 +805,9 @@ function showColumnQuestion(){
 
     let dependencies = getDirectDependencies(formula);
 
-    document.getElementById("progress").innerHTML = `
-        Resolviendo columna: <b>${formula}</b><br>
-        Fila ${currentRowInColumn + 1} de ${guidedTable.rows.length}<br><br>
-        ❌ Errores: <b>${mistakes}</b>
-    `;
+    updateGuidedProgress();
+
+    document.getElementById("feedback").innerHTML = "";
 
     document.getElementById("questionArea").innerHTML = `
         <div class="question">
@@ -831,7 +822,7 @@ function showColumnQuestion(){
                     </div>
                 `).join("")}
             </div>
-            <div class="answerButtons">
+            <div class="answerButtons" id="guidedAnswerBtns">
                 <button type="button" onclick="checkColumnAnswer(true); return false;">
                     🟩 Verdadero
                 </button>
@@ -850,88 +841,240 @@ function showColumnQuestion(){
 
 function checkColumnAnswer(answer){
 
-    let feedback =
-        document.getElementById("feedback");
+    let feedback = document.getElementById("feedback");
+    let formula  = guidedTable.columns[currentColumn];
+    let row      = guidedTable.rows[currentRowInColumn];
 
     if(answer === currentAnswer){
 
-        feedback.innerHTML = "";
-
-        let formula =
-            guidedTable.columns[currentColumn];
-
-        guidedTable.rows[currentRowInColumn][formula]
-            = answer;
-
+        // Guardar respuesta y actualizar tabla
+        guidedTable.rows[currentRowInColumn][formula] = answer;
         renderGuidedTable();
 
-        currentRowInColumn++;
+        // Puntaje
+        guidedStreak++;
+        if(guidedStreak > guidedMaxStreak) guidedMaxStreak = guidedStreak;
+        let bonus  = Math.floor(guidedStreak / 3) * 2;
+        let points = 10 + bonus;
+        guidedScore += points;
 
-        if(
-            currentRowInColumn >=
-            guidedTable.rows.length
-        ){
-            currentRowInColumn = 0;
-            currentColumn++;
-        }
+        // Deshabilitar botones V/F
+        let btns = document.getElementById("guidedAnswerBtns");
+        if(btns) btns.style.display = "none";
 
-        if(
-            currentColumn >=
-            guidedTable.columns.length
-        ){
+        let explanation = generateTableFeedback(formula, row);
+        let streakMsg   = guidedStreak >= 3
+            ? `<div class="ogStreakMsg">🔥 ¡Racha de ${guidedStreak}! +${bonus} extra</div>`
+            : "";
 
-            renderGuidedTable();
-
-            document.getElementById(
-                "progress"
-            ).innerHTML = "";
-
-            feedback.innerHTML = "";
-
-            document.getElementById(
-                "questionArea"
-            ).innerHTML = `
-            <div class="step">
-                🎉 ¡Tabla completada!
-                <br><br>
-                ❌ Errores cometidos: <b>${mistakes}</b>
+        feedback.innerHTML = `
+            <div class="ogFeedback ogCorrect">
+                <div class="ogFeedbackTitle">✅ ¡Correcto! <span class="ogPoints">+${points} pts</span></div>
+                ${streakMsg}
+                <div class="ogExplanation">${explanation}</div>
+                <button class="ogNextBtn" onclick="advanceGuidedMode(); return false;">Continuar →</button>
             </div>
-            `;
+        `;
 
-            document.getElementById(
-                "formula"
-            ).value = "";
-
-            return;
-
-        }
-
-        renderGuidedTable();
-        showColumnQuestion();
+        updateGuidedProgress();
 
     } else {
 
+        guidedStreak = 0;
         mistakes++;
 
-        let formula =
-            guidedTable.columns[currentColumn];
-
-        document.getElementById(
-            "progress"
-        ).innerHTML = `
-            Resolviendo columna: <b>${formula}</b><br>
-            Fila ${currentRowInColumn + 1} de ${guidedTable.rows.length}<br><br>
-            ❌ Errores: <b>${mistakes}</b>
-        `;
+        let explanation = generateTableFeedback(formula, row);
 
         feedback.innerHTML = `
-        <div class="feedback wrong">
-            ❌ Intenta nuevamente
-        </div>
+            <div class="ogFeedback ogWrong">
+                <div class="ogFeedbackTitle">❌ No es correcto</div>
+                <div class="ogExplanation">${explanation}</div>
+            </div>
         `;
+
+        updateGuidedProgress();
 
     }
 
+}
+
+function advanceGuidedMode(){
+
+    document.getElementById("feedback").innerHTML = "";
+
+    if(guidedFreeMode){
+        advanceFreeMode();
+        return;
+    }
+
+    currentRowInColumn++;
+
+    if(currentRowInColumn >= guidedTable.rows.length){
+        currentRowInColumn = 0;
+        currentColumn++;
+    }
+
+    if(currentColumn >= guidedTable.columns.length){
+        showGuidedEnd();
+        return;
+    }
+
+    renderGuidedTable();
+    showColumnQuestion();
+
+}
+
+function showGuidedEnd(){
+    renderGuidedTable();
+    document.getElementById("progress").innerHTML = "";
+
+    let medal = mistakes === 0 ? "🥇"
+              : mistakes <= 2 ? "🥈"
+              : mistakes <= 5 ? "🥉"
+              : "💪";
+    let msg = mistakes === 0 ? "¡Perfecto, sin ningún error!"
+            : mistakes <= 2 ? "¡Muy bien, casi perfecto!"
+            : mistakes <= 5 ? "Bien. Seguí practicando."
+            : "La práctica hace al maestro.";
+
+    document.getElementById("questionArea").innerHTML = `
+        <div class="ogEndCard">
+            <div class="ogEndMedal">${medal}</div>
+            <h2 class="ogEndTitle">🎉 ¡Tabla completada!</h2>
+            <p class="ogEndMsg">${msg}</p>
+            <div class="ogEndStats">
+                <div class="ogStat">
+                    <span class="ogStatVal">⭐ ${guidedScore}</span>
+                    <span class="ogStatLabel">puntos</span>
+                </div>
+                <div class="ogStat">
+                    <span class="ogStatVal">❌ ${mistakes}</span>
+                    <span class="ogStatLabel">errores</span>
+                </div>
+                <div class="ogStat">
+                    <span class="ogStatVal">🔥 ${guidedMaxStreak}</span>
+                    <span class="ogStatLabel">racha máx.</span>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.getElementById("formula").value = "";
+}
+
+function updateGuidedProgress(){
+    if(guidedFreeMode){
+        updateFreeModeProgress();
+        return;
+    }
+
+    let formula   = (currentColumn >= 0 && currentColumn < guidedTable.columns.length)
+        ? guidedTable.columns[currentColumn] : "";
+    let totalRows = guidedTable.rows ? guidedTable.rows.length : 0;
+
+    document.getElementById("progress").innerHTML = `
+        <div class="gameProgressBar">
+            <span class="gpItem">📋 <b>${formula}</b></span>
+            <span class="gpItem">Fila ${currentRowInColumn + 1}/${totalRows}</span>
+            <span class="gpItem gpScore">⭐ ${guidedScore} pts</span>
+            <span class="gpItem gpStreak">${guidedStreak >= 2 ? "🔥 ×" + guidedStreak : ""}</span>
+            <span class="gpItem">❌ ${mistakes}</span>
+        </div>
+    `;
+}
+
+function getMainOperatorChar(formula){
+    let pos = findMainOperatorPosition(formula);
+    return pos >= 0 ? formula[pos] : null;
+}
+
+function generateTableFeedback(formula, row){
+
+    let correctVal = solveSubformula(formula, row);
+    let correctStr = correctVal ? "V" : "F";
+    let op   = getMainOperatorChar(formula);
+    let deps = getDirectDependencies(formula);
+
+    // Negación
+    if(op === "¬" && deps.length === 1){
+        let inner    = deps[0];
+        let innerVal = row[inner] !== undefined
+            ? row[inner]
+            : solveSubformula(inner, row);
+        let innerStr = innerVal ? "V" : "F";
+        return `La <b>negación</b> invierte el valor:
+                <b>${inner}</b>&nbsp;=&nbsp;${innerStr}
+                &nbsp;→&nbsp;
+                <b>¬${inner}</b>&nbsp;=&nbsp;<b>${correctStr}</b>.`;
+    }
+
+    // Operadores binarios
+    if(deps.length === 2){
+        let [left, right] = deps;
+        let leftVal  = row[left]  !== undefined ? row[left]  : solveSubformula(left,  row);
+        let rightVal = row[right] !== undefined ? row[right] : solveSubformula(right, row);
+        let lStr = leftVal  ? "V" : "F";
+        let rStr = rightVal ? "V" : "F";
+
+        switch(op){
+            case "∧":
+                if(!correctVal){
+                    let who = !leftVal && !rightVal
+                        ? "ninguna parte es V"
+                        : !leftVal
+                            ? `<b>${left}</b>&nbsp;=&nbsp;F`
+                            : `<b>${right}</b>&nbsp;=&nbsp;F`;
+                    return `La <b>conjunción</b> (∧) es Falsa porque ${who}.
+                            Para ser V, <b>ambas</b> partes deben ser V.`;
+                } else {
+                    return `La <b>conjunción</b> (∧) es Verdadera porque ambas partes son V:
+                            <b>${left}</b>&nbsp;=&nbsp;V y <b>${right}</b>&nbsp;=&nbsp;V.`;
+                }
+
+            case "∨":
+                if(correctVal){
+                    let who = leftVal && rightVal
+                        ? "ambas partes son V"
+                        : leftVal
+                            ? `<b>${left}</b>&nbsp;=&nbsp;V`
+                            : `<b>${right}</b>&nbsp;=&nbsp;V`;
+                    return `La <b>disyunción</b> (∨) es Verdadera porque ${who}.
+                            Solo es F cuando <b>ambas</b> son F.`;
+                } else {
+                    return `La <b>disyunción</b> (∨) es Falsa porque ambas partes son F:
+                            <b>${left}</b>&nbsp;=&nbsp;F y <b>${right}</b>&nbsp;=&nbsp;F.`;
+                }
+
+            case "→":
+                if(!correctVal){
+                    return `La <b>implicación</b> (→) es Falsa <b>solo</b> cuando
+                            el antecedente es V y el consecuente es F.
+                            Aquí <b>${left}</b>&nbsp;=&nbsp;V y <b>${right}</b>&nbsp;=&nbsp;F.`;
+                } else {
+                    if(!leftVal){
+                        return `La <b>implicación</b> (→) es Verdadera porque
+                                el antecedente <b>${left}</b>&nbsp;=&nbsp;F.
+                                Una implicación con antecedente Falso <b>siempre</b> es Verdadera.`;
+                    } else {
+                        return `La <b>implicación</b> (→) es Verdadera porque
+                                el consecuente <b>${right}</b>&nbsp;=&nbsp;V.`;
+                    }
+                }
+
+            case "↔":
+                if(correctVal){
+                    return `El <b>bicondicional</b> (↔) es Verdadero porque ambas partes
+                            tienen el <b>mismo</b> valor:
+                            <b>${left}</b>&nbsp;=&nbsp;${lStr} y <b>${right}</b>&nbsp;=&nbsp;${rStr}.`;
+                } else {
+                    return `El <b>bicondicional</b> (↔) es Falso porque las partes
+                            tienen valores <b>distintos</b>:
+                            <b>${left}</b>&nbsp;=&nbsp;${lStr} y <b>${right}</b>&nbsp;=&nbsp;${rStr}.`;
+                }
+        }
+    }
+
+    return `El valor correcto es <b>${correctStr}</b>.`;
 }
 
 function deleteLastSymbol(){
@@ -953,6 +1096,200 @@ function clearFormula(){
 }
 
 
+
+// =====================================================
+// MODO AUTOEVALUACIÓN (libre)
+// =====================================================
+
+function startFreeMode(){
+    if(operatorGame.active) exitOperatorGame();
+
+    const formula = document.getElementById("formula").value.trim();
+    if(formula === "") return;
+    if(!isValidFormula(formula)){
+        alert("La fórmula lógica no es válida");
+        return;
+    }
+
+    const vars      = getVariables(formula);
+    const rowsCount = Math.pow(2, vars.length);
+
+    let subformulas = extractSubformulas(formula).filter(f => !/^[a-z]$/i.test(f));
+    let columns     = [...vars, ...subformulas];
+    let rows        = [];
+
+    for(let i = 0; i < rowsCount; i++){
+        let row = {};
+        vars.forEach((v, idx) => {
+            row[v] = !Boolean((i >> (vars.length - idx - 1)) & 1);
+        });
+        rows.push(row);
+    }
+
+    guidedTable      = { vars, columns, rows };
+    guidedFreeMode   = true;
+    freeCellSelected = false;
+    mistakes         = 0;
+    guidedScore      = 0;
+    guidedStreak     = 0;
+    guidedMaxStreak  = 0;
+    currentColumn    = -1;
+    currentRowInColumn = -1;
+
+    clearMainAreas();
+
+    renderGuidedTable();
+    updateFreeModeProgress();
+
+    document.getElementById("questionArea").innerHTML = `
+        <div class="freeModeHint">
+            Hacé clic en cualquier celda <b>?</b> para resolverla.<br>
+            Las celdas 🔒 requieren resolver antes sus dependencias.
+        </div>
+    `;
+}
+
+function isCellReady(colIndex, rowIndex){
+    let col = guidedTable.columns[colIndex];
+    let row = guidedTable.rows[rowIndex];
+    if(row[col] !== undefined) return false;
+    let deps = getDirectDependencies(col);
+    return deps.every(dep => row[dep] !== undefined);
+}
+
+function selectFreeCell(colIndex, rowIndex){
+    if(freeCellSelected) return;
+    currentColumn      = colIndex;
+    currentRowInColumn = rowIndex;
+    freeCellSelected   = true;
+    renderGuidedTable();
+    showColumnQuestion();
+}
+
+function advanceFreeMode(){
+    freeCellSelected   = false;
+    currentColumn      = -1;
+    currentRowInColumn = -1;
+
+    let subCols = guidedTable.columns.slice(guidedTable.vars.length);
+    let allDone = subCols.every(col =>
+        guidedTable.rows.every(row => row[col] !== undefined)
+    );
+
+    if(allDone){
+        guidedFreeMode = false;
+        showGuidedEnd();
+        return;
+    }
+
+    renderGuidedTable();
+    updateFreeModeProgress();
+
+    document.getElementById("questionArea").innerHTML = `
+        <div class="freeModeHint">✅ ¡Correcto! Elegí otra celda <b>?</b> para continuar.</div>
+    `;
+}
+
+function updateFreeModeProgress(){
+    let subCols = guidedTable.columns.slice(guidedTable.vars.length);
+    let total   = subCols.length * guidedTable.rows.length;
+    let done    = subCols.reduce((acc, col) =>
+        acc + guidedTable.rows.filter(row => row[col] !== undefined).length, 0);
+
+    document.getElementById("progress").innerHTML = `
+        <div class="gameProgressBar">
+            <span class="gpItem">✏️ <b>Autoevaluación</b></span>
+            <span class="gpItem">📋 ${done}/${total} celdas</span>
+            <span class="gpItem gpScore">⭐ ${guidedScore} pts</span>
+            <span class="gpItem gpStreak">${guidedStreak >= 2 ? "🔥 ×" + guidedStreak : ""}</span>
+            <span class="gpItem">❌ ${mistakes}</span>
+        </div>
+    `;
+}
+
+// =====================================================
+// MODAL DE AYUDA
+// =====================================================
+
+function toggleHelpModal(){
+    let modal = document.getElementById("helpModal");
+    if(modal.classList.contains("helpVisible")){
+        modal.classList.remove("helpVisible");
+        return;
+    }
+    document.getElementById("helpModalBody").innerHTML = buildHelpContent();
+    modal.classList.add("helpVisible");
+}
+
+function closeHelpModal(e){
+    if(e.target === document.getElementById("helpModal")){
+        document.getElementById("helpModal").classList.remove("helpVisible");
+    }
+}
+
+function buildHelpContent(){
+    let currentOp = null;
+
+    if(guidedTable.columns && currentColumn >= 0 && currentColumn < guidedTable.columns.length){
+        currentOp = getMainOperatorChar(guidedTable.columns[currentColumn]);
+    }
+
+    let html = "";
+
+    if(currentOp){
+        html += `
+            <div class="helpContext">
+                Estás resolviendo: <b>${guidedTable.columns[currentColumn]}</b><br>
+                Operador principal: <b>${currentOp}</b>
+            </div>
+            <div class="helpHighlightCard">${getOperatorHelpHTML(currentOp)}</div>
+            <div class="helpDivider">── Referencia completa ──</div>
+        `;
+    }
+
+    ["¬","∧","∨","→","↔"].forEach(op => {
+        html += `<div class="helpOpCard ${op === currentOp ? "helpOpActive" : ""}">
+                    ${getOperatorHelpHTML(op)}
+                 </div>`;
+    });
+
+    return html;
+}
+
+function getOperatorHelpHTML(op){
+    const data = {
+        "¬": { name:"Negación",      rule:"Invierte el valor.",
+               cols:["p","¬p"],
+               rows:[["V","F"],["F","V"]] },
+        "∧": { name:"Conjunción",    rule:"Solo V cuando <b>ambas</b> son V.",
+               cols:["p","q","p∧q"],
+               rows:[["V","V","V"],["V","F","F"],["F","V","F"],["F","F","F"]] },
+        "∨": { name:"Disyunción",    rule:"Solo F cuando <b>ambas</b> son F.",
+               cols:["p","q","p∨q"],
+               rows:[["V","V","V"],["V","F","V"],["F","V","V"],["F","F","F"]] },
+        "→": { name:"Implicación",   rule:"Solo F cuando p=V <b>y</b> q=F.",
+               cols:["p","q","p→q"],
+               rows:[["V","V","V"],["V","F","F"],["F","V","V"],["F","F","V"]] },
+        "↔": { name:"Bicondicional", rule:"V cuando ambas tienen el <b>mismo</b> valor.",
+               cols:["p","q","p↔q"],
+               rows:[["V","V","V"],["V","F","F"],["F","V","F"],["F","F","V"]] }
+    };
+    let d = data[op];
+    if(!d) return "";
+
+    let html = `<div class="helpOpTitle">${op} — ${d.name}</div>`;
+    html    += `<div class="helpOpRule">💡 ${d.rule}</div>`;
+    html    += `<table class="helpTable"><tr>${d.cols.map(c=>`<th>${c}</th>`).join("")}</tr>`;
+    d.rows.forEach(r => {
+        html += `<tr>${r.map((cell,i) => {
+            let last = i === r.length - 1;
+            let cl   = last ? (cell==="V" ? "helpTrue" : "helpFalse") : "";
+            return `<td class="${cl}">${cell}</td>`;
+        }).join("")}</tr>`;
+    });
+    html += `</table>`;
+    return html;
+}
 
 // =====================================================
 // JUEGO: OPERADOR PRINCIPAL

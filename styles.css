@@ -134,6 +134,26 @@ textarea{
     background:#ca6f1e;
 }
 
+/* Botón autoevaluación */
+.buttons .freeBtn{
+    background:#8e44ad;
+}
+
+.buttons .freeBtn:hover{
+    background:#6c3483;
+}
+
+/* Botón ayuda */
+.buttons .helpBtn{
+    background:#27ae60;
+    flex:0 0 auto;
+    min-width:140px;
+}
+
+.buttons .helpBtn:hover{
+    background:#1e8449;
+}
+
 table{
     width:100%;
     border-collapse:collapse;
@@ -532,6 +552,195 @@ th.activeRow.currentColumn{ background:#ffcccc !important; }
 }
 
 /* ======================================
+   MODO AUTOEVALUACIÓN
+   ====================================== */
+
+/* Celda disponible para clickear */
+.freeCell{
+    cursor:pointer;
+    background:#eef5ff !important;
+    font-weight:bold;
+    border:2px dashed #4a7dff !important;
+    transition:background 0.15s, border-color 0.15s;
+}
+
+.freeCell:hover{
+    background:#d0e8ff !important;
+    border-color:#2255cc !important;
+}
+
+/* Celda bloqueada (dependencias pendientes) */
+.lockedCell{
+    background:#f5f5f5 !important;
+    color:#bbb;
+    font-size:15px;
+    cursor:default;
+}
+
+/* Celda ya respondida */
+.cellTrue{
+    background:#c9f7c5 !important;
+    font-weight:bold;
+}
+
+.cellFalse{
+    background:#cfe1ff !important;
+    font-weight:bold;
+}
+
+/* Hint del modo libre */
+.freeModeHint{
+    margin-top:20px;
+    font-size:20px;
+    background:#eef5ff;
+    padding:20px 24px;
+    border-radius:15px;
+    text-align:center;
+    color:#29527a;
+    line-height:1.6;
+}
+
+/* ======================================
+   MODAL DE AYUDA
+   ====================================== */
+
+.helpModal{
+    display:none;
+    position:fixed;
+    top:0; left:0;
+    width:100%; height:100%;
+    background:rgba(0,0,0,0.5);
+    z-index:1000;
+    align-items:center;
+    justify-content:center;
+}
+
+.helpModal.helpVisible{
+    display:flex;
+}
+
+.helpModalContent{
+    background:white;
+    border-radius:20px;
+    max-width:680px;
+    width:92%;
+    max-height:85vh;
+    overflow-y:auto;
+    padding:24px;
+    box-shadow:0 8px 32px rgba(0,0,0,0.25);
+}
+
+.helpModalHeader{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:18px;
+    font-size:22px;
+    font-weight:bold;
+    color:#29527a;
+}
+
+.helpModalClose{
+    background:#eee;
+    border:none;
+    border-radius:8px;
+    width:36px; height:36px;
+    font-size:18px;
+    cursor:pointer;
+    transition:0.2s;
+    line-height:1;
+}
+
+.helpModalClose:hover{
+    background:#ffd4d4;
+    color:#c0392b;
+}
+
+/* Contexto actual */
+.helpContext{
+    background:#eef5ff;
+    border-radius:12px;
+    padding:14px 18px;
+    font-size:18px;
+    margin-bottom:14px;
+    line-height:1.6;
+}
+
+.helpHighlightCard{
+    border:3px solid #7c4dff;
+    border-radius:14px;
+    padding:16px 18px;
+    margin-bottom:14px;
+    background:#faf7ff;
+}
+
+.helpDivider{
+    text-align:center;
+    color:#aaa;
+    font-size:14px;
+    margin:16px 0;
+    letter-spacing:1px;
+}
+
+/* Tarjetas de cada operador */
+.helpOpCard{
+    border:2px solid #eee;
+    border-radius:12px;
+    padding:14px 18px;
+    margin-bottom:12px;
+    transition:border-color 0.2s;
+}
+
+.helpOpCard.helpOpActive{
+    border-color:#7c4dff;
+    background:#f8f4ff;
+}
+
+.helpOpTitle{
+    font-size:19px;
+    font-weight:bold;
+    color:#29527a;
+    margin-bottom:4px;
+}
+
+.helpOpRule{
+    font-size:15px;
+    color:#e67e22;
+    margin-bottom:10px;
+}
+
+/* Mini tabla dentro del modal */
+.helpTable{
+    width:auto;
+    font-size:18px;
+    margin:0;
+    border-collapse:collapse;
+}
+
+.helpTable th{
+    background:#f0f4ff;
+    padding:7px 18px;
+    border:1px solid #ddd;
+    font-weight:bold;
+}
+
+.helpTable td{
+    padding:6px 18px;
+    border:1px solid #ddd;
+    text-align:center;
+}
+
+.helpTrue{
+    background:#c9f7c5;
+    font-weight:bold;
+}
+
+.helpFalse{
+    background:#cfe1ff;
+    font-weight:bold;
+}
+
+/* ======================================
    RESPONSIVE
    ====================================== */
 @media(max-width:700px){
@@ -541,7 +750,6 @@ th.activeRow.currentColumn{ background:#ffcccc !important; }
     table{ font-size:15px; }
     textarea{ font-size:20px; }
 
-    .instructions-image img{ width:95%; }
     .question{ font-size:20px; }
     .variableBox{ font-size:22px; }
     .answerButtons{ flex-direction:column; }
@@ -554,5 +762,11 @@ th.activeRow.currentColumn{ background:#ffcccc !important; }
     .ogEndStats{ gap:16px; }
     .ogStat{ padding:12px 18px; min-width:80px; }
     .ogStatVal{ font-size:26px; }
+
+    .helpModalContent{ padding:16px; }
+    .helpTable th,
+    .helpTable td{ padding:5px 10px; font-size:15px; }
+    .buttons .helpBtn{ min-width:100px; }
+    .freeModeHint{ font-size:17px; }
 
 }

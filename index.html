@@ -28,18 +28,6 @@
 
 
 
-        <!-- IMAGEN -->
-
-        <div class="instructions-image">
-
-            <img
-                src="conectivas.png"
-                alt="Conectivas Lógicas">
-
-        </div>
-
-
-
         <!-- ENTRADA -->
 
         <textarea
@@ -176,11 +164,39 @@
 
             <button
                 type="button"
+                class="freeBtn"
+                onclick="startFreeMode(); return false;">
+                ✏️ Autoevaluación
+            </button>
+
+            <button
+                type="button"
                 class="gameBtn"
                 onclick="startOperatorGame(); return false;">
                 🎯 Operador Principal
             </button>
 
+            <button
+                type="button"
+                class="helpBtn"
+                onclick="toggleHelpModal(); return false;">
+                ❓ Ayuda
+            </button>
+
+        </div>
+
+
+
+        <!-- MODAL DE AYUDA -->
+
+        <div id="helpModal" class="helpModal" onclick="closeHelpModal(event)">
+            <div class="helpModalContent">
+                <div class="helpModalHeader">
+                    <span>📚 Tablas de verdad</span>
+                    <button class="helpModalClose" onclick="toggleHelpModal(); return false;">✕</button>
+                </div>
+                <div id="helpModalBody" class="helpModalBody"></div>
+            </div>
         </div>
 
 
